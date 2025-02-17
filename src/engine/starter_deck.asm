@@ -1,10 +1,11 @@
 ; adds the chosen starter deck to the player's first deck configuration
 ; and also adds to the collection its corresponding extra cards
 ; input:
-;	a = $0:  Charmander and Friends starter deck
-;	a = $1:  Squirtle and Friends starter deck
-;	a = $2:  Bulbasaur and Friends starter deck
-AddStarterDeck::
+; - a = starter deck chosen
+;   $0 = Charmander
+;   $1 = Squirtle
+;   $2 = Bulbasaur
+_AddStarterDeck:
 	add a
 	ld e, a
 	ld d, 0
@@ -13,96 +14,103 @@ AddStarterDeck::
 	ld a, PLAYER_TURN
 	ldh [hWhoseTurn], a
 	ld a, [hli] ; main deck
+	add 2
 	push hl
 	ld hl, sDeck1
-	call CopyDeckNameAndCards
+	call StoreDeckIDInSRAM
 	pop hl
-	rst SwapTurn
+	call SwapTurn
 	ld a, [hli] ; extra deck
+	add 2
 	call LoadDeck
-	rst SwapTurn
+	call SwapTurn
 
 ; wPlayerDeck = main starter deck
 ; wOpponentDeck = extra cards
 	call EnableSRAM
-	ld h, HIGH(sCardCollection)
+	ld hl, sCardCollection
 	ld de, wPlayerDeck
 	ld c, DECK_SIZE
 .loop_main_cards
+	push hl
 	ld a, [de]
 	inc de
+	add l
 	ld l, a
+	ld a, [de]
+	inc de
+	adc h
+	ld h, a
 	res CARD_NOT_OWNED_F, [hl]
+	pop hl
 	dec c
 	jr nz, .loop_main_cards
 
-;	ld h, HIGH(sCardCollection)
+	ld hl, sCardCollection
 	ld de, wOpponentDeck
 	ld c, 30 ; number of extra cards
 .loop_extra_cards
+	push hl
 	ld a, [de]
 	inc de
+	add l
 	ld l, a
+	ld a, [de]
+	inc de
+	adc h
+	ld h, a
 	res CARD_NOT_OWNED_F, [hl]
 	inc [hl]
+	pop hl
 	dec c
 	jr nz, .loop_extra_cards
-; ALL CARDS HACK: Uncomment the following 17 lines of code to give the Player a full collection.
-;	ld c, NUM_CARDS
-;.loop_debug_collection
-;	ld l, c
-;	res CARD_NOT_OWNED_F, [hl]
-;	ld a, [hl]
-;	add 16 ; 16 copies of every card
-;	ld [hl], a
-;	dec c
-;	jr nz, .loop_debug_collection
-;	ld c, DOUBLE_COLORLESS_ENERGY - 1
-;.loop_debug_energies
-;	ld l, c
-;	ld a, [hl]
-;	add 30 ; plus an additional 30 copies of each Basic Energy card
-;	ld [hl], a
-;	dec c
-;	jr nz, .loop_debug_energies
 	jp DisableSRAM
 
 .StarterCardIDs
 	; main deck, extra cards
-	db CHARMANDER_AND_FRIENDS_DECK, CHARMANDER_EXTRA_DECK
-	db SQUIRTLE_AND_FRIENDS_DECK,   SQUIRTLE_EXTRA_DECK
-	db BULBASAUR_AND_FRIENDS_DECK,  BULBASAUR_EXTRA_DECK
+	db CHARMANDER_AND_FRIENDS_DECK_ID, CHARMANDER_EXTRA_DECK_ID
+	db SQUIRTLE_AND_FRIENDS_DECK_ID,   SQUIRTLE_EXTRA_DECK_ID
+	db BULBASAUR_AND_FRIENDS_DECK_ID,  BULBASAUR_EXTRA_DECK_ID
 
-
-; clears saved data (card collection/saved decks/Card Pop! data/etc)
-; then adds the starter decks as saved decks and marks all cards as not owned
-InitSaveData::
+; clears saved data (card Collection/saved decks/etc)
+; then adds the starter decks as saved decks
+; marks all cards in Collection as not owned
+InitSaveData:
 ; clear card and deck save data
 	call EnableSRAM
 	ld a, PLAYER_TURN
 	ldh [hWhoseTurn], a
 	ld hl, sCardAndDeckSaveData
 	ld bc, sCardAndDeckSaveDataEnd - sCardAndDeckSaveData
-	call ClearData
+.loop_clear
+	xor a
+	ld [hli], a
+	dec bc
+	ld a, c
+	or b
+	jr nz, .loop_clear
 
 ; add the starter decks
 	ld a, CHARMANDER_AND_FRIENDS_DECK
 	ld hl, sSavedDeck1
-	call CopyDeckNameAndCards
+	call StoreDeckIDInSRAM
 	ld a, SQUIRTLE_AND_FRIENDS_DECK
 	ld hl, sSavedDeck2
-	call CopyDeckNameAndCards
+	call StoreDeckIDInSRAM
 	ld a, BULBASAUR_AND_FRIENDS_DECK
 	ld hl, sSavedDeck3
-	call CopyDeckNameAndCards
+	call StoreDeckIDInSRAM
 
-; change every card in the collection to not owned
+; marks all cards in Collection to not owned
 	call EnableSRAM
 	ld hl, sCardCollection
-	ld a, CARD_NOT_OWNED
+	ld bc, CARD_COLLECTION_SIZE
 .loop_collection
-	ld [hl], a
-	inc l
+	ld a, CARD_NOT_OWNED
+	ld [hli], a
+	dec bc
+	ld a, b
+	or c
 	jr nz, .loop_collection
 
 	ld hl, sCurrentDuel
@@ -111,57 +119,30 @@ InitSaveData::
 	ld [hli], a ; sCurrentDuelChecksum
 	ld [hl], a
 
-; clears Card Pop! names
-	ld hl, sCardPopNameList
-	ld c, CARDPOP_NAME_LIST_MAX_ELEMS
-.loop_card_pop_names
-	ld [hl], $0
-	ld de, NAME_BUFFER_LENGTH
-	add hl, de
-	dec c
-	jr nz, .loop_card_pop_names
-
 ; saved configuration options
-	ld a, 2
-	ld [sPrinterContrastLevel], a
-;	ld a, TEXT_SPEED_3 ; default text speed at start of game
-	ld a, TEXT_SPEED_5 ; default text speed at start of game
+	ld a, $2
 	ld [sTextSpeed], a
 	ld [wTextSpeed], a
 
-; clear miscellaneous save data
-	ld hl, s0a004
+; miscellaneous data
 	xor a
-	ld [hli], a ; s0a004 = $00
-	ld [hli], a ; sTotalCardPopsDone = $00
-	inc hl      ; skip sTextSpeed
-	ld [hli], a ; sAnimationsDisabled = $00
-	inc hl      ; skip s0a008
-	ld [hli], a ; sSkipDelayAllowed = $00
-	ld [hl], a  ; sReceivedLegendaryCards = $00
-	inc a ; $01
-	ld [sUnnamedDeckCounter], a
+	ld [sAnimationsDisabled], a
+	ld [sSkipDelayAllowed], a
+	ld [s0a004], a
+	ld [sReceivedLegendaryCards], a
+	farcall InitPromotionalCardAndDeckCounterSaveData
 	jp DisableSRAM
 
-
-; preserves all registers except af
 ; input:
-;	a = deck ID (*_DECK constant)
-;	hl = where to copy (in SRAM)
-CopyDeckNameAndCards:
+;    a = Deck ID
+;    hl = destination to copy
+StoreDeckIDInSRAM:
 	push de
 	push bc
 	push hl
 	call LoadDeck
 	jr c, .done
-
-; copy deck name
-	ld hl, wDeckName
-	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	ld de, wDefaultText
-	call CopyText
+	call .CopyDeckName
 	pop hl
 	call EnableSRAM
 	push hl
@@ -174,18 +155,11 @@ CopyDeckNameAndCards:
 	jr nz, .loop_write_name
 	pop hl
 
-; copy deck cards
 	push hl
 	ld de, DECK_NAME_SIZE
 	add hl, de
 	ld de, wPlayerDeck
-	ld c, DECK_SIZE
-.loop_write_cards
-	ld a, [de]
-	inc de
-	ld [hli], a
-	dec c
-	jr nz, .loop_write_cards
+	call CompressDeckToSRAM
 	call DisableSRAM
 	or a
 .done
@@ -193,3 +167,11 @@ CopyDeckNameAndCards:
 	pop bc
 	pop de
 	ret
+
+.CopyDeckName
+	ld hl, wDeckName
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wDefaultText
+	jp CopyText

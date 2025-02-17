@@ -1,6 +1,6 @@
 ; empties screen in preparation to draw some menu
 InitMenuScreen:
-	xor a ; SYM_SPACE
+	ld a, $0
 	ld [wTileMapFill], a
 	call EmptyScreen
 	call LoadSymbolsFont
@@ -18,4 +18,28 @@ InitMenuScreen:
 	ldh [rSCY], a
 .skip_clear_scroll
 	call SetDefaultPalettes
-	jp ZeroObjectPositionsAndToggleOAMCopy
+	call ZeroObjectPositions
+	ld a, $1
+	ld [wVBlankOAMCopyToggle], a
+	ret
+
+; saves all pals to SRAM, then fills them with white.
+; after flushing, it loads back the saved pals from SRAM.
+FlashWhiteScreen:
+	ldh a, [hBankSRAM]
+
+	push af
+	ld a, BANK("SRAM1")
+	call BankswitchSRAM
+	call CopyPalsToSRAMBuffer
+	call DisableSRAM
+	call SetWhitePalettes
+	call FlushAllPalettes
+	call EnableLCD
+	call DoFrameIfLCDEnabled
+	call LoadPalsFromSRAMBuffer
+	call FlushAllPalettes
+	pop af
+
+	call BankswitchSRAM
+	jp DisableSRAM

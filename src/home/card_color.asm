@@ -1,28 +1,24 @@
-; output:
-;	a = Active Pokemon's type/color (accounting for Venomoth's Shift Pokemon Power if active)
+; return the turn holder's arena card's color in a, accounting for Venomoth's Shift Pokemon Power if active
 GetArenaCardColor::
 	xor a ; PLAY_AREA_ARENA
 ;	fallthrough
 
-; preserves all registers except af
-; input:
-;	a = play area location offset of the desired card (PLAY_AREA_* constant)
-; output:
-;	a = type/color of the turn holder's Pokemon from input
-;	    (accounting for Venomoth's Shift Pokemon Power if active)
+; input: a = play area location offset (PLAY_AREA_*) of the desired card
+; return the turn holder's card's color in a, accounting for Venomoth's Shift Pokemon Power if active
 GetPlayAreaCardColor::
 	push hl
 	push de
 	ld e, a
 	add DUELVARS_ARENA_CARD_CHANGED_TYPE
-	get_turn_duelist_var
+	call GetTurnDuelistVariable
 	bit HAS_CHANGED_COLOR_F, a
 	jr nz, .has_changed_color
 .regular_color
 	ld a, e
 	add DUELVARS_ARENA_CARD
-	get_turn_duelist_var
-	call GetCardTypeFromDeckIndex_SaveDE
+	call GetTurnDuelistVariable
+	call GetCardIDFromDeckIndex
+	call GetCardType
 	cp TYPE_TRAINER
 	jr nz, .got_type
 	ld a, COLORLESS
@@ -36,111 +32,71 @@ GetPlayAreaCardColor::
 	jr c, .regular_color ; jump if can't use Shift
 	ld a, e
 	add DUELVARS_ARENA_CARD_CHANGED_TYPE
-	get_turn_duelist_var
+	call GetTurnDuelistVariable
 	pop de
 	pop hl
 	and $f
 	ret
 
-
-; finds the Weakness of one of the turn holder's in-play Pokemon
-; preserves bc and de
-; input:
-;	a = Pokémon's play area location offset (PLAY_AREA_* constant)
-; output:
-;	a = Weakness of the Pokemon from input
+; return in a the weakness of the turn holder's arena or benchx Pokemon given the PLAY_AREA_* value in a
+; if a == 0 and [DUELVARS_ARENA_CARD_CHANGED_WEAKNESS] != 0,
+; return [DUELVARS_ARENA_CARD_CHANGED_WEAKNESS] instead
 GetPlayAreaCardWeakness::
 	or a
 	jr z, GetArenaCardWeakness
 	add DUELVARS_ARENA_CARD
 	jr GetCardWeakness
 
-; finds the Weakness of the turn holder's Active Pokemon's, either what's
-; printed on the card or whatever it might have become via a card effect
-; preserves bc and de
-; output:
-;	a = Weakness of the turn holder's Active Pokemon
+; return in a the weakness of the turn holder's arena Pokemon
+; if [DUELVARS_ARENA_CARD_CHANGED_WEAKNESS] != 0, return it instead
 GetArenaCardWeakness::
 	ld a, DUELVARS_ARENA_CARD_CHANGED_WEAKNESS
-	get_turn_duelist_var
+	call GetTurnDuelistVariable
 	or a
 	ret nz
 	ld a, DUELVARS_ARENA_CARD
 ;	fallthrough
 
 GetCardWeakness::
-	get_turn_duelist_var
+	call GetTurnDuelistVariable
 	call LoadCardDataToBuffer2_FromDeckIndex
 	ld a, [wLoadedCard2Weakness]
 	ret
 
-
-; finds the Resistance of one of the turn holder's in-play Pokemon
-; preserves bc and de
-; input:
-;	a = Pokémon's play area location offset (PLAY_AREA_* constant)
-; output:
-;	a = Resistance of the Pokemon from input
+; return in a the resistance of the turn holder's arena or benchx Pokemon given the PLAY_AREA_* value in a
+; if a == 0 and [DUELVARS_ARENA_CARD_CHANGED_RESISTANCE] != 0,
+; return [DUELVARS_ARENA_CARD_CHANGED_RESISTANCE] instead
 GetPlayAreaCardResistance::
 	or a
-	jr z, GetArenaCardResistance ; it's the Active Pokemon
-	; it's a Benched Pokemon
+	jr z, GetArenaCardResistance
 	add DUELVARS_ARENA_CARD
 	jr GetCardResistance
 
-; finds the Resistance of the turn holder's Active Pokemon's, either what's
-; printed on the card or whatever it might have become via a card effect
-; preserves bc and de
-; output:
-;	a = Resistance of the turn holder's Active Pokemon
+; return in a the resistance of the arena Pokemon
+; if [DUELVARS_ARENA_CARD_CHANGED_RESISTANCE] != 0, return it instead
 GetArenaCardResistance::
 	ld a, DUELVARS_ARENA_CARD_CHANGED_RESISTANCE
-	get_turn_duelist_var
+	call GetTurnDuelistVariable
 	or a
 	ret nz
 	ld a, DUELVARS_ARENA_CARD
 ;	fallthrough
 
 GetCardResistance::
-	get_turn_duelist_var
+	call GetTurnDuelistVariable
 	call LoadCardDataToBuffer2_FromDeckIndex
 	ld a, [wLoadedCard2Resistance]
 	ret
 
-
-; converts a color to its equivalent WR_* (weakness/resistance) value
-; preserves all registers except af
-; input:
-; 	a = type/color constant (e.g. FIRE, GRASS, etc.)
-TranslateColorToWR::
-	push hl
-	add LOW(InvertedPowersOf2)
-	ld l, a
-	ld a, HIGH(InvertedPowersOf2)
-	adc $0
-	ld h, a
-	ld a, [hl]
-	pop hl
-	ret
-
-InvertedPowersOf2::
-	db $80, $40, $20, $10, $08, $04, $02, $01
-
-
-; checks if the turn holder's CHARIZARD's Energy Burn is active,
-; and if so, it turns all Energy (except for Double Colorless Energy)
-; at wAttachedEnergies into Fire Energy
-; preserves de
-; input:
-;	e = Pokémon's play area location offset (PLAY_AREA_* constant)
+; this function checks if turn holder's CHARIZARD energy burn is active, and if so, turns
+; all energies at wAttachedEnergies except double colorless energies into fire energies
 HandleEnergyBurn::
 	ld a, DUELVARS_ARENA_CARD
-	add e
-	get_turn_duelist_var
-	call _GetCardIDFromDeckIndex
-	cp CHARIZARD
+	call GetTurnDuelistVariable
+	call GetCardIDFromDeckIndex
+	cp16 CHARIZARD
 	ret nz
-	ld a, e
+	xor a ; PLAY_AREA_ARENA
 	call CheckIsIncapableOfUsingPkmnPower
 	ret c
 	ld hl, wAttachedEnergies
@@ -151,5 +107,5 @@ HandleEnergyBurn::
 	dec c
 	jr nz, .zero_next_energy
 	ld a, [wTotalAttachedEnergies]
-	ld [wAttachedEnergies + FIRE], a
+	ld [wAttachedEnergies], a
 	ret

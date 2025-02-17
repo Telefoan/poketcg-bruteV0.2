@@ -5,61 +5,27 @@ INCLUDE "constants.asm"
 SECTION "rst00", ROM0
 	ret
 	ds 7
-
 SECTION "rst08", ROM0
-; returns [[hWhoseTurn] << 8 + a] in a and in [hl]
-; i.e. duelvar a of the player whose turn it is
-; preserves bc and de
-; input:
-;	a = wPlayerDuelVariables constant
-GetTurnDuelistVariable::
-	ld l, a
-	ldh a, [hWhoseTurn]
-	ld h, a
-	ld a, [hl]
 	ret
-	ds 2
-
+	ds 7
 SECTION "rst10", ROM0
-; switches ROM bank to a
-; preserves all registers
-; input:
-;	a = ROM bank to use
-BankswitchROM::
-	ldh [hBankROM], a
-	ld [MBC3RomBank], a
 	ret
-	ds 2
-
+	ds 7
 SECTION "rst18", ROM0
 	jp Bank1Call
 	ds 5
-
 SECTION "rst20", ROM0
 	jp RST20
 	ds 5
-
 SECTION "rst28", ROM0
 	jp FarCall
 	ds 5
-
 SECTION "rst30", ROM0
-; returns [hWhoseTurn] <-- ([hWhoseTurn] ^ $1)
-;   As a side effect, this also returns a duelist variable in a similar manner to
-;   GetNonTurnDuelistVariable, but this function seems to only ever be called to
-;   swap the turn value.
-; preserves all registers
-SwapTurn::
-	push af
-	push hl
-	call GetNonTurnDuelistVariable
-	ld a, h
-	ldh [hWhoseTurn], a
-SECTION "rst38", ROM0
-	pop hl
-	pop af
 	ret
-	ds 5
+	ds 7
+SECTION "rst38", ROM0
+	ret
+	ds 7
 
 ; interrupts
 SECTION "vblank", ROM0
@@ -73,8 +39,8 @@ SECTION "timer", ROM0
 	jp TimerHandler
 	ds 5
 SECTION "serial", ROM0
-	jp SerialHandler
-	ds 5
+	reti
+	ds 7
 SECTION "joypad", ROM0
 	reti
 	ds $9f
@@ -109,10 +75,9 @@ INCLUDE "home/random.asm"
 INCLUDE "home/decompress.asm"
 INCLUDE "home/objects.asm"
 INCLUDE "home/farcall.asm"
-INCLUDE "home/sgb.asm"
+INCLUDE "home/hblank.asm"
 INCLUDE "home/math.asm"
 INCLUDE "home/list.asm"
-INCLUDE "home/serial.asm"
 INCLUDE "home/duel.asm"
 INCLUDE "home/card_collection.asm"
 INCLUDE "home/text_box.asm"
@@ -124,9 +89,9 @@ INCLUDE "home/print_text.asm"
 INCLUDE "home/card_data.asm"
 INCLUDE "home/effect_commands.asm"
 INCLUDE "home/load_deck.asm"
+INCLUDE "home/damage.asm"
 INCLUDE "home/coin_toss.asm"
 INCLUDE "home/duel_menus.asm"
-INCLUDE "home/printer.asm"
 INCLUDE "home/substatus.asm"
 INCLUDE "home/card_color.asm"
 INCLUDE "home/sound.asm"
@@ -136,6 +101,9 @@ INCLUDE "home/script.asm"
 INCLUDE "home/play_animation.asm"
 INCLUDE "home/memory.asm"
 INCLUDE "home/call_regs.asm"
+INCLUDE "home/lcd_enable_frame.asm"
+INCLUDE "home/division.asm"
+INCLUDE "home/play_song.asm"
 INCLUDE "home/load_animation.asm"
 INCLUDE "home/scroll.asm"
 INCLUDE "home/audio_callback.asm"

@@ -1,9 +1,6 @@
-; switches to rombank (a + top2 of h shifted down),
+; switch to rombank (a + top2 of h shifted down),
 ; set top2 of h to 01 (switchable ROM bank area),
-; returns old rombank ID on top-of-stack
-; preserves all registers
-; input:
-;	a/h/l = used to figure out which ROM bank to switch to
+; return old rombank id on top-of-stack
 BankpushROM::
 	push hl
 	push bc
@@ -35,16 +32,12 @@ BankpushROM::
 	pop de
 	pop af
 	add b
-	rst BankswitchROM
+	call BankswitchROM
 	pop bc
 	ret
 
-
-; switches to rombank a,
-; returns old rombank ID on top-of-stack
-; preserves all registers
-; input:
-;	a = ROM bank to switch to
+; switch to rombank a,
+; return old rombank id on top-of-stack
 BankpushROM2::
 	push hl
 	push bc
@@ -68,19 +61,17 @@ BankpushROM2::
 	ld h, d
 	pop de
 	pop af
-	rst BankswitchROM
+	call BankswitchROM
 	pop bc
 	ret
 
-
-; restores rombank from top-of-stack
-; preserves all registers except af
+; restore rombank from top-of-stack
 BankpopROM::
 	push hl
 	push de
 	ld hl, sp+$7
 	ld a, [hld]
-	rst BankswitchROM
+	call BankswitchROM
 	dec hl
 	ld d, [hl]
 	dec hl
@@ -93,4 +84,10 @@ BankpopROM::
 	pop de
 	pop hl
 	pop af
+	ret
+
+; switch ROM bank to a
+BankswitchROM::
+	ldh [hBankROM], a
+	ld [MBC3RomBank], a
 	ret

@@ -1,10 +1,13 @@
 AIActionTable_ImRonald:
-	dw AIMainTurnLogic                ; .do_turn (unused)
-	dw AIMainTurnLogic                ; .do_turn
+	dw .do_turn ; unused
+	dw .do_turn
 	dw .start_duel
-	dw AIDecideBenchPokemonToSwitchTo ; .forced_switch
-	dw AIDecideBenchPokemonToSwitchTo ; .ko_switch
-	dw AIPickPrizeCards               ; .take_prize
+	dw .forced_switch
+	dw .ko_switch
+	dw .take_prize
+
+.do_turn
+	jp AIMainTurnLogic
 
 .start_duel
 	call InitAIDuelVars
@@ -14,26 +17,35 @@ AIActionTable_ImRonald:
 	ret nc
 	jp AIPlayInitialBasicCards
 
+.forced_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.ko_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.take_prize
+	jp AIPickPrizeCards
+
 .list_arena
-	db LAPRAS
-	db SEEL
-	db CHARMANDER
-	db CUBONE
-	db SQUIRTLE
-	db GROWLITHE
-	db $00
+	dw LAPRAS
+	dw SEEL
+	dw CHARMANDER
+	dw CUBONE
+	dw SQUIRTLE
+	dw GROWLITHE
+	dw NULL
 
 .list_bench
-	db CHARMANDER
-	db SQUIRTLE
-	db SEEL
-	db CUBONE
-	db GROWLITHE
-	db LAPRAS
-	db $00
+	dw CHARMANDER
+	dw SQUIRTLE
+	dw SEEL
+	dw CUBONE
+	dw GROWLITHE
+	dw LAPRAS
+	dw NULL
 
 .list_retreat
-	db $00
+	dw NULL
 
 .list_energy
 	ai_energy CHARMANDER,     3, +0
@@ -47,17 +59,17 @@ AIActionTable_ImRonald:
 	ai_energy LAPRAS,         3, +0
 	ai_energy CUBONE,         3, +0
 	ai_energy MAROWAK_LV26,   3, +0
-	db $00
+	dw NULL
 
 .list_prize
-	db LAPRAS
-	db $00
+	dw LAPRAS
+	dw NULL
 
 .store_list_pointers
 	store_list_pointer wAICardListAvoidPrize, .list_prize
 	store_list_pointer wAICardListArenaPriority, .list_arena
 	store_list_pointer wAICardListBenchPriority, .list_bench
 	store_list_pointer wAICardListPlayFromHandPriority, .list_bench
-	store_list_pointer wAICardListRetreatBonus, .list_retreat
+	; missing store_list_pointer wAICardListRetreatBonus, .list_retreat
 	store_list_pointer wAICardListEnergyBonus, .list_energy
 	ret

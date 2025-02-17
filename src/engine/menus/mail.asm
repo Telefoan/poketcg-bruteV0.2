@@ -1,6 +1,7 @@
-; clears all PC packs in WRAM and then gives the 1st pack.
-; this doesn't clear in SRAM, so it's not done to clear PC pack data.
-; preserves all registers except af
+; clears all PC packs in WRAM 
+; and then gives the 1st pack
+; this doesn't clear in SRAM so
+; it's not done to clear PC pack data
 InitPCPacks:
 	push hl
 	push bc
@@ -12,12 +13,11 @@ InitPCPacks:
 	ld [hli], a
 	dec c
 	jr nz, .loop_packs
-	inc a ; mail 1 booster pack (from PCMailBoosterPacks)
+	ld a, $1
 	call TryGivePCPack
 	pop bc
 	pop hl
 	ret
-
 
 _PCMenu_ReadMail:
 	ld a, [wd291]
@@ -55,7 +55,6 @@ _PCMenu_ReadMail:
 	ld [wd291], a
 	ret
 
-
 MailScreenLabels:
 	db 1, 0
 	tx MailText
@@ -68,8 +67,6 @@ MailScreenLabels:
 
 	db $ff
 
-
-; preserves de
 PCMailHandleDPadInput:
 	ldh a, [hDPadHeld]
 	and D_PAD
@@ -131,7 +128,6 @@ PCMailTransitionTable:
 	db $0b, $0c, $02, $0d ; mail 15
 	assert_table_length NUM_MAILS
 
-
 PCMailHandleAInput:
 	ldh a, [hKeysPressed]
 	and A_BUTTON
@@ -147,7 +143,7 @@ PCMailHandleAInput:
 	add hl, bc
 	ld a, [hl]
 	ld [wSelectedPCPack], a
-	and $7f ; mask out PACK_UNOPENED_F
+	and $7f
 	ld [hl], a
 	or a
 	ret z
@@ -192,7 +188,6 @@ PCMailHandleAInput:
 	ld hl, MailScreenLabels
 	call PrintLabels
 	jp DoFrameIfLCDEnabled
-
 
 PCMailTextPages:
 	; unused
@@ -259,14 +254,13 @@ PCMailTextPages:
 	tx Mail15Part1Text
 	dw NULL
 
-
 TryOpenPCMailBoosterPack:
-	xor a ; FALSE
+	xor a
 	ld [wAnotherBoosterPack], a
 	ld a, [wSelectedPCPack]
 	bit PACK_UNOPENED_F, a
 	jr z, .booster_already_open
-	and $7f ; mask out PACK_UNOPENED_F
+	and $7f
 	add a
 	ld c, a
 	ld b, $00
@@ -275,12 +269,13 @@ TryOpenPCMailBoosterPack:
 	ld a, [hli]
 	push hl
 	call GiveBoosterPack
-	ld a, TRUE
+	ld a, $01
 	ld [wAnotherBoosterPack], a
 	pop hl
 	ld a, [hl]
 	or a
 	call nz, GiveBoosterPack
+.done
 	jp DisableLCD
 
 .booster_already_open
@@ -289,80 +284,67 @@ TryOpenPCMailBoosterPack:
 	call SetupText
 	ldtx hl, MailBoosterPackAlreadyOpenedText
 	call PrintScrollableText_NoTextBoxLabel
-	jp DisableLCD
+	jr .done
 
 PCMailBoosterPacks:
 	table_width 2, PCMailBoosterPacks
 	db $00, $00 ; unused
-	db BOOSTER_COLOSSEUM_NEUTRAL, $00                       ; mail 1
-	db BOOSTER_LABORATORY_PSYCHIC, $00                      ; mail 2
-	db BOOSTER_EVOLUTION_GRASS, $00                         ; mail 3
-	db BOOSTER_MYSTERY_LIGHTNING_COLORLESS, $00             ; mail 4
-	db BOOSTER_EVOLUTION_FIGHTING, $00                      ; mail 5
-	db BOOSTER_COLOSSEUM_FIRE, $00                          ; mail 6
-	db BOOSTER_LABORATORY_PSYCHIC, $00                      ; mail 7
-	db BOOSTER_LABORATORY_PSYCHIC, $00                      ; mail 8
-	db BOOSTER_MYSTERY_WATER_COLORLESS, $00                 ; mail 9
+	db BOOSTER_COLOSSEUM_NEUTRAL, $00 ; mail 1
+	db BOOSTER_LABORATORY_PSYCHIC, $00 ; mail 2
+	db BOOSTER_EVOLUTION_GRASS, $00 ; mail 3
+	db BOOSTER_MYSTERY_LIGHTNING_COLORLESS, $00 ; mail 4
+	db BOOSTER_EVOLUTION_FIGHTING, $00 ; mail 5
+	db BOOSTER_COLOSSEUM_FIRE, $00 ; mail 6
+	db BOOSTER_LABORATORY_PSYCHIC, $00 ; mail 7
+	db BOOSTER_LABORATORY_PSYCHIC, $00 ; mail 8
+	db BOOSTER_MYSTERY_WATER_COLORLESS, $00 ; mail 9
 	db BOOSTER_COLOSSEUM_NEUTRAL, BOOSTER_EVOLUTION_NEUTRAL ; mail 10
-	db BOOSTER_MYSTERY_NEUTRAL, BOOSTER_LABORATORY_NEUTRAL  ; mail 11
-	db BOOSTER_COLOSSEUM_TRAINER, $00                       ; mail 12
-	db BOOSTER_EVOLUTION_TRAINER, $00                       ; mail 13
-	db BOOSTER_MYSTERY_TRAINER_COLORLESS, $00               ; mail 14
-	db BOOSTER_LABORATORY_TRAINER, $00                      ; mail 15
+	db BOOSTER_MYSTERY_NEUTRAL, BOOSTER_LABORATORY_NEUTRAL ; mail 11
+	db BOOSTER_COLOSSEUM_TRAINER, $00 ; mail 12
+	db BOOSTER_EVOLUTION_TRAINER, $00 ; mail 13
+	db BOOSTER_MYSTERY_TRAINER_COLORLESS, $00 ; mail 14
+	db BOOSTER_LABORATORY_TRAINER, $00 ; mail 15
 	assert_table_length NUM_MAILS + 1
 
-
-; preserves de and hl
-ShowMailMenuCursor:
-	ld a, SYM_CURSOR_R
-	jr DrawMailMenuCursor
-
-; preserves de and hl
 UpdateMailMenuCursor:
 	ld a, [wCursorBlinkTimer]
 	and $10
 	jr z, ShowMailMenuCursor
-;	fallthrough
-
-; preserves de and hl
+	jr HideMailMenuCursor
+ShowMailMenuCursor:
+	ld a, SYM_CURSOR_R
+	jr DrawMailMenuCursor
 HideMailMenuCursor:
-	xor a ; SYM_SPACE
-;	fallthrough
-
-; preserves de and hl
-; input:
-;	a = tile to draw
+	ld a, SYM_SPACE
+	jr DrawMailMenuCursor ; can be fallthrough
 DrawMailMenuCursor:
 	push af
-	call GetPCPackSelectionCoordinates
+	call GePCPackSelectionCoordinates
 	pop af
 	jp WriteByteToBGMap0
 
-
-; prints all of the PC packs that the player has already obtained.
-; preserves bc
+; prints all the PC packs that player
+; has already obtained
 PrintObtainedPCPacks:
 	ld e, $0
 	ld hl, wPCPacks
 .loop_packs
-	ld a, [hli]
+	ld a, [hl]
 	or a
 	jr z, .next_pack
 	ld a, e
 	call PrintPCPackName
 .next_pack
+	inc hl
 	inc e
 	ld a, e
 	cp NUM_PC_PACKS
 	jr c, .loop_packs
 	ret
 
-
-; preserves bc and hl
-; input:
-;	a = e-mail index (1-15)
-; output:
-;	de = text ID corresponding to the name of the mail from input
+; outputs in de the text ID
+; corresponding to the name
+; of the mail in input a
 GetPCPackNameTextID:
 	push hl
 	add a
@@ -395,11 +377,8 @@ GetPCPackNameTextID:
 	tx Mail15Text
 	assert_table_length NUM_MAILS
 
-
-; prints on screen the name of the PC pack from input in a
-; preserves all registers except af
-; input:
-;	a = e-mail index (1-15)
+; prints on screen the name of
+; the PC pack from input in a
 PrintPCPackName:
 	push hl
 	push bc
@@ -412,18 +391,17 @@ PrintPCPackName:
 	call GetPCPackCoordinates
 	ld e, c
 	ld d, b
-	call InitTextPrinting_PrintTextNoDelay
+	call InitTextPrinting
+	call PrintTextNoDelay
 	pop de
 	pop bc
 	pop hl
 	ret
 
-
-; prints empty characters on screen corresponding to the PC pack in a,
-; in order to create the blinking effect of unopened PC packs.
-; preserves all registers except af
-; input:
-;	a = e-mail index (1-15)
+; prints empty characters on screen
+; corresponding to the PC pack in a
+; this is to create the blinking
+; effect of unopened PC packs
 PrintEmptyPCPackName:
 	push hl
 	push bc
@@ -431,15 +409,14 @@ PrintEmptyPCPackName:
 	call GetPCPackCoordinates
 	ld e, c
 	ld d, b
+	call InitTextPrinting
 	ldtx hl, EmptyMailNameText
-	call InitTextPrinting_PrintTextNoDelay
+	call PrintTextNoDelay
 	pop de
 	pop bc
 	pop hl
 	ret
 
-
-; preserves bc
 BlinkUnopenedPCPacks:
 	ld e, $00
 	ld hl, wPCPacks
@@ -469,31 +446,24 @@ BlinkUnopenedPCPacks:
 	jr c, .loop_packs
 	ret
 
-
-; preserves de and hl
-; input:
-;	a = e-mail index (1-15)
-; output:
-;	bc = coordinates corresponding to the PC pack from input
+; outputs in bc the coordinates
+; corresponding to the PC pack in a
 GetPCPackCoordinates:
 	ld c, a
 	ld a, [wPCPackSelection]
 	push af
 	ld a, c
 	ld [wPCPackSelection], a
-	call GetPCPackSelectionCoordinates
+	call GePCPackSelectionCoordinates
 	inc b
 	pop af
 	ld [wPCPackSelection], a
 	ret
 
-
-; preserves de and hl
-; input:
-;	[wPCPackSelection] = e-mail index (1-15)
-; output:
-;	bc = coordinates corresponding to the PC pack from input
-GetPCPackSelectionCoordinates:
+; outputs in bc the coordinates
+; corresponding to the PC pack
+; that is stored in wPCPackSelection
+GePCPackSelectionCoordinates:
 	push hl
 	ld a, [wPCPackSelection]
 	add a
@@ -526,49 +496,40 @@ PCMailCoordinates:
 	db 13, 10 ; mail 15
 	assert_table_length NUM_MAILS
 
-
-; assigns a booster pack entry to a mail slot in wPCPacks.
-; preserves all registers except af
-; input:
-;	a = e-mail index (1-15)
+; gives the pc pack described in a
 TryGivePCPack:
 	push hl
 	push bc
+	push de
 	ld b, a
 	ld c, NUM_PC_PACKS
 	ld hl, wPCPacks
 .searchLoop1
 	ld a, [hli]
-	and $7f ; mask out PACK_UNOPENED_F
+	and $7f
 	cp b
-	jr z, .quit ; exit if this booster pack was already assigned
+	jr z, .quit
 	dec c
 	jr nz, .searchLoop1
 	ld c, NUM_PC_PACKS
 	ld hl, wPCPacks
 .findFreeSlotLoop
 	ld a, [hl]
-	and $7f ; mask out PACK_UNOPENED_F
+	and $7f
 	jr z, .foundFreeSlot
 	inc hl
 	dec c
 	jr nz, .findFreeSlotLoop
+	debug_nop
 	jr .quit
 
 .foundFreeSlot
 	ld a, b
 	or PACK_UNOPENED ; mark pack as unopened
 	ld [hl], a
+
 .quit
+	pop de
 	pop bc
 	pop hl
 	ret
-
-
-;----------------------------------------
-;        UNREFERENCED FUNCTIONS
-;----------------------------------------
-;
-;Unknown_107c2:
-;	db $01, $00, $00, $4a, $21, $b5, $42, $e0
-;	db $03, $4a, $29, $94, $52, $fF, $7f, $00

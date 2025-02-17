@@ -8,7 +8,7 @@ Start::
 	ldh [rIE], a
 	call ZeroRAM
 	ld a, $1
-	rst BankswitchROM
+	call BankswitchROM
 	xor a
 	call BankswitchSRAM
 	call BankswitchVRAM0
@@ -23,10 +23,9 @@ Start::
 	call SetupPalettes
 	call SetupSound
 	call SetupTimer
-	call ResetSerial
 	call CopyDMAFunction
 	call ValidateSRAM
 	ld a, BANK(GameLoop)
-	rst BankswitchROM
+	call BankswitchROM
 	ld sp, $e000
 	jp GameLoop

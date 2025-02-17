@@ -1,5 +1,4 @@
 ; vblank interrupt handler
-; preserves all registers
 VBlankHandler::
 	push af
 	push bc
@@ -39,7 +38,7 @@ VBlankHandler::
 	res IN_VBLANK, [hl]
 .done
 	pop af
-	rst BankswitchROM
+	call BankswitchROM
 	pop hl
 	pop de
 	pop bc

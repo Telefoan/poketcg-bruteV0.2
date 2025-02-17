@@ -5,7 +5,7 @@ HallOfHonorLoadMap:
 Script_fbe1:
 	start_script
 	print_text Text05b5
-	ask_question_jump_default_yes WouldYouLikeToBuildADeckText, .ows_fbee
+	ask_question_jump_default_yes Text05b6, .ows_fbee
 	print_text Text05b7
 	quit_script_fully
 
@@ -22,7 +22,7 @@ Script_fbf1:
 	give_card MOLTRES_LV37
 	give_card ARTICUNO_LV37
 	give_card DRAGONITE_LV41
-	show_card_received_screen $ff
+	show_card_received_screen $ffff
 .ows_fc05
 	flash_screen 0
 	print_text Text05b9

@@ -44,7 +44,7 @@ Duel_Init:
 	call PlaySong
 	call FlashWhiteScreen
 	call DoFrameIfLCDEnabled
-	lb bc, SYM_CURSOR_D, SYM_BOX_BOTTOM ; cursor tile, tile behind cursor
+	lb bc, $2f, $1d ; cursor tile, tile behind cursor
 	lb de, 18, 17 ; x, y
 	call SetCursorParametersForTextBox
 	call WaitForButtonAorB
@@ -67,40 +67,40 @@ OpponentDeckNameLabel:
 OpponentTitlesAndDeckNames:
 	table_width 4, OpponentTitlesAndDeckNames
 
-	tx TechNPCName
+	tx TechText
 	tx SamsPracticeDeckName
 
-	tx NullText
+	tx EmptyText
 	dw NULL
 
-	tx TechNPCName
+	tx TechText
 	tx SamsPracticeDeckName
 
-	tx NullText
+	tx EmptyText
 	dw NULL
 
-	tx NullText
+	tx EmptyText
 	dw NULL
 
-	tx NullText
+	tx EmptyText
 	dw NULL
 
-	tx NullText
+	tx EmptyText
 	dw NULL
 
-	tx NullText
+	tx EmptyText
 	dw NULL
 
-	tx NullText
+	tx EmptyText
 	dw NULL
 
-	tx TechNPCName
+	tx TechText
 	tx LightningAndFireDeckName
 
-	tx TechNPCName
+	tx TechText
 	tx WaterAndFightingDeckName
 
-	tx TechNPCName
+	tx TechText
 	tx GrassAndPsychicDeckName
 
 	tx GrandMasterText
@@ -139,16 +139,16 @@ OpponentTitlesAndDeckNames:
 	tx FireClubMasterText
 	tx FireChargeDeckName
 
-	tx NullText
+	tx EmptyText
 	tx ImRonaldDeckName
 
-	tx NullText
+	tx EmptyText
 	tx PowerfulRonaldDeckName
 
-	tx NullText
+	tx EmptyText
 	tx InvincibleRonaldDeckName
 
-	tx NullText
+	tx EmptyText
 	tx LegendaryRonaldDeckName
 
 	tx FightingClubMemberText

@@ -58,12 +58,31 @@ MACRO get_event_value
 	db \1
 ENDM
 
+; the rst $38 handler is a single ret instruction
+; probably used for testing purposes during development
+DEF debug_nop EQUS "rst $38"
+
 ; Returns to the pointer in bc instead of where the stack was.
 MACRO retbc
 	push bc
 	ret
 ENDM
 
-MACRO get_turn_duelist_var
-	rst GetTurnDuelistVariable
+MACRO cp16
+	ld a, d
+	cp HIGH(\1)
+	jr nz, :+
+	ld a, e
+	cp LOW(\1)
+:
+ENDM
+
+MACRO cphl
+	inc hl
+	ld a, [hld]
+	cp HIGH(\1)
+	jr nz, :+
+	ld a, [hl]
+	cp LOW(\1)
+:
 ENDM

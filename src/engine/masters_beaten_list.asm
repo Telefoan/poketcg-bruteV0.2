@@ -1,4 +1,3 @@
-; preserves all registers except af
 ClearMasterBeatenList:
 	push hl
 	push bc
@@ -13,11 +12,8 @@ ClearMasterBeatenList:
 	pop hl
 	ret
 
-
-; writes Master in register a to first empty slot in wMastersBeatenList
-; preserves all registers except af
-; input:
-;	a = master to add to wMastersBeatenList ($1-$a)
+; writes Master in register a to
+; first empty slot in wMastersBeatenList
 AddMasterBeatenToList:
 	push hl
 	push bc
@@ -33,6 +29,7 @@ AddMasterBeatenToList:
 	inc hl
 	dec c
 	jr nz, .loop
+	debug_nop
 	jr .exit
 
 .found_empty_slot
@@ -44,9 +41,8 @@ AddMasterBeatenToList:
 	pop hl
 	ret
 
-
-; iterates all masters and attempts to add each of them to wMastersBeatenList
-; preserves all registers except af
+; iterates all masters and attempts to
+; add each of them to wMastersBeatenList
 AddAllMastersToMastersBeatenList:
 	ld a, $01
 .loop
