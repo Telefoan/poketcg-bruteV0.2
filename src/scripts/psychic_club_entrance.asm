@@ -19,9 +19,7 @@ ClubEntranceAfterDuel:
 LoadClubEntrance:
 	call TryFirstRonaldDuel
 	call TrySecondRonaldDuel
-;	fallthrough
-
-TryFirstRonaldEncounter:
+	; try first Ronald encounter
 	ld a, NPC_RONALD1
 	ld [wTempNPC], a
 	call FindLoadedNPC
@@ -187,7 +185,7 @@ NPCMovement_e90f:
 Preload_Ronald3InClubEntrance:
 	get_event_value EVENT_RONALD_SECOND_DUEL_STATE
 	ld e, 5 ; medal requirement for ronald duel
-	jr Func_e8a0
+	jp Func_e8a0
 
 Script_SecondRonaldDuel:
 	start_script

@@ -1,8 +1,8 @@
 ; Checks if the command type at a is one of the commands of the attack or
 ; card effect currently in use, and executes its associated function if so.
 ; input:
-;	a = command type to check
-;	[wLoadedAttackEffectCommands] = pointer to the list of commands for the current attack or Trainer card
+   ; a = command type to check
+   ; [wLoadedAttackEffectCommands] = pointer to list of commands of current attack or trainer card
 TryExecuteEffectCommandFunction::
 	push af
 	; grab pointer to command list from wLoadedAttackEffectCommands
@@ -22,25 +22,22 @@ TryExecuteEffectCommandFunction::
 	ldh a, [hBankROM]
 	push af
 	ld a, [wEffectFunctionsBank]
-	rst BankswitchROM
+	call BankswitchROM
 	or a
 	call CallHL
 	push af
 	; restore original bank and return
 	pop bc
 	pop af
-	rst BankswitchROM
+	call BankswitchROM
 	push bc
 	pop af
 	ret
 
-
-; preserves de
 ; input:
-;	a = command type to check
-;	hl = list of commands for the current attack or Trainer card
-; output:
-;	carry = set:  if the command type from input wasn't found
+  ; a = command type to check
+  ; hl = list of commands of current attack or trainer card
+; return nc if command type matching a is found, carry otherwise
 CheckMatchingCommand::
 	ld c, a
 	ld a, l
@@ -54,7 +51,7 @@ CheckMatchingCommand::
 	ldh a, [hBankROM]
 	push af
 	ld a, BANK(EffectCommands)
-	rst BankswitchROM
+	call BankswitchROM
 	; store the bank number of command functions ($b) in wEffectFunctionsBank
 	ld a, BANK("Effect Functions")
 	ld [wEffectFunctionsBank], a
@@ -76,13 +73,13 @@ CheckMatchingCommand::
 	ld l, a
 	; restore bank and return nc
 	pop af
-	rst BankswitchROM
+	call BankswitchROM
 	or a
 	ret
 
 .no_more_commands
-	; restore bank and return carry
+	; restore bank and return c
 	pop af
-	rst BankswitchROM
+	call BankswitchROM
 	scf
 	ret

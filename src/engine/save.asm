@@ -1,7 +1,6 @@
 ; xors sb800
 ; this has the effect of invalidating the save data checksum
-; which the game interprets as having no save data
-; preserves all registers except af
+; which the game interprets as being having no save data
 InvalidateSaveData:
 	push hl
 	ldh a, [hBankSRAM]
@@ -10,32 +9,35 @@ InvalidateSaveData:
 	ld a, BANK("SRAM2")
 	call BankswitchSRAM
 	ld a, $08
-	cpl
+	xor $ff
 	ld [sBackupGeneralSaveData + 0], a
-	ld a, $ff
+	ld a, $00
+	xor $ff
 	ld [sBackupGeneralSaveData + 1], a
-	call DiscardSavedDuelData
 	pop af
 
 	call BankswitchSRAM
+	call DisableSRAM
+	call EnableSRAM
+	bank1call DiscardSavedDuelData
+	call DisableSRAM
 	pop hl
 	ret
 
+; saves all data to SRAM, including
+; General save data and Album/Deck data
+; and backs up in SRAM2
+SaveAndBackupData:
+	push de
+	ld de, sGeneralSaveData
+	call SaveGeneralSaveDataFromDE
+	ld de, sAlbumProgress
+	call UpdateAlbumProgress
+	call WriteBackupGeneralSaveData
+	call WriteBackupCardAndDeckSaveData
+	pop de
+	ret
 
-; discards the data of a duel that was saved by SaveDuelData, by setting the first byte
-; of sCurrentDuel to $00, and zeroing the checksum (next two bytes)
-; preserves bc and de
-DiscardSavedDuelData:
-	call EnableSRAM
-	ld hl, sCurrentDuel ; in SRAM2
-	xor a
-	ld [hli], a
-	ld [hli], a
-	ld [hl], a
-	jp DisableSRAM
-
-
-; preserves all registers except af
 _SaveGeneralSaveData::
 	push de
 	call GetReceivedLegendaryCards
@@ -46,53 +48,56 @@ _SaveGeneralSaveData::
 	pop de
 	ret
 
-
-; preserves all registers except af
-; input:
-;	de = pointer to general game data in SRAM
+; de = pointer to general game data in SRAM
 SaveGeneralSaveDataFromDE:
 	push hl
 	push bc
 	call EnableSRAM
+	push de
 	farcall TryGiveMedalPCPacks
 	ld [wMedalCount], a
 	call OverworldMap_GetOWMapID
 	ld [wCurOverworldMap], a
+	pop de
+	push de
 	call CopyGeneralSaveDataToSRAM
+	pop de
+	call DisableSRAM
 	pop bc
 	pop hl
-	jp DisableSRAM
-
+	ret
 
 ; writes in de total num of cards collected
-; and in (de + 1) total num of cards to collect
+; and total num of cards to collect
 ; also updates wTotalNumCardsCollected and wTotalNumCardsToCollect
-; preserves all registers except af
-; input:
-;	de = sAlbumProgress
 UpdateAlbumProgress:
 	push hl
+	push bc
 	push de
 	push de
 	call GetCardAlbumProgress
 	call EnableSRAM
 	pop hl
-	ld a, d
-	ld [wTotalNumCardsCollected], a
-	ld [hli], a
 	ld a, e
-	ld [wTotalNumCardsToCollect], a
+	ld [wTotalNumCardsCollected + 0], a
+	ld [hli], a
+	ld a, d
+	ld [wTotalNumCardsCollected + 1], a
+	ld [hli], a
+	ld a, c
+	ld [wTotalNumCardsToCollect + 0], a
+	ld [hli], a
+	ld a, b
+	ld [wTotalNumCardsToCollect + 1], a
 	ld [hl], a
+	call DisableSRAM
 	pop de
+	pop bc
 	pop hl
-	jp DisableSRAM
+	ret
 
-
-; saves values that are listed in WRAMToSRAMMapper
-; from WRAM to SRAM, and calculates its checksum
-; preserves all registers except af
-; input:
-;	de = pointer to general game data in SRAM
+; save values that are listed in WRAMToSRAMMapper
+; from WRAM to SRAM, and calculate its checksum
 CopyGeneralSaveDataToSRAM:
 	push hl
 	push bc
@@ -103,12 +108,10 @@ CopyGeneralSaveDataToSRAM:
 	ld e, l
 	ld d, h
 	xor a
-	ld hl, wGeneralSaveDataCheckSum
-	ld [hli], a
-	ld [hl], a
-	ld hl, wGeneralSaveDataByteCount
-	ld [hli], a
-	ld [hl], a
+	ld [wGeneralSaveDataByteCount + 0], a
+	ld [wGeneralSaveDataByteCount + 1], a
+	ld [wGeneralSaveDataCheckSum + 0], a
+	ld [wGeneralSaveDataCheckSum + 1], a
 
 	ld hl, WRAMToSRAMMapper
 .loop_map
@@ -129,12 +132,36 @@ CopyGeneralSaveDataToSRAM:
 	ld a, [wGeneralSaveDataByteCount + 1]
 	adc b
 	ld [wGeneralSaveDataByteCount + 1], a
-	; copy bytes to SRAM
+	call .CopyBytesToSRAM
+	inc hl
+	inc hl
+	jr .loop_map
+
+.done_copy
+	pop hl
+	ld a, $08
+	ld [hli], a
+	ld a, $00
+	ld [hli], a
+	ld a, [wGeneralSaveDataByteCount + 0]
+	ld [hli], a
+	ld a, [wGeneralSaveDataByteCount + 1]
+	ld [hli], a
+	ld a, [wGeneralSaveDataCheckSum + 0]
+	ld [hli], a
+	ld a, [wGeneralSaveDataCheckSum + 1]
+	ld [hli], a
+	pop de
+	pop bc
+	pop hl
+	ret
+
+.CopyBytesToSRAM
 	push hl
-	ld hl, wTempPointer
-	ld a, [hli]
-	ld h, [hl]
+	ld a, [wTempPointer + 0]
 	ld l, a
+	ld a, [wTempPointer + 1]
+	ld h, a
 .loop_bytes
 	push bc
 	ld a, [hli]
@@ -156,37 +183,13 @@ CopyGeneralSaveDataToSRAM:
 	ld [wTempPointer + 0], a
 	ld a, h
 	ld [wTempPointer + 1], a
-	pop hl	
-	inc hl
-	inc hl
-	jr .loop_map
-
-.done_copy
-	pop hl ; SRAM location from de input
-	ld a, $08
-	ld [hli], a
-	ld a, $00
-	ld [hli], a
-	ld a, [wGeneralSaveDataByteCount + 0]
-	ld [hli], a
-	ld a, [wGeneralSaveDataByteCount + 1]
-	ld [hli], a
-	ld a, [wGeneralSaveDataCheckSum + 0]
-	ld [hli], a
-	ld a, [wGeneralSaveDataCheckSum + 1]
-	ld [hli], a
-	pop de
-	pop bc
 	pop hl
 	ret
 
-
-; preserves all registers except af
-; output:
-;	carry = set:  if no error was found in sBackupGeneralSaveData (i.e. save data exists)
+; returns carry if no error
+; is found in sBackupGeneralSaveData
 ValidateBackupGeneralSaveData:
 	push de
-	call EnableSRAM
 	ldh a, [hBankSRAM]
 	push af
 	ld a, BANK(sBackupGeneralSaveData)
@@ -203,10 +206,8 @@ ValidateBackupGeneralSaveData:
 	cp 1
 	ret
 
-
-; preserves all registers except af
-; output:
-;	carry = set:  if no error was found in sGeneralSaveData (i.e. save data exists)
+; returns carry if no error
+; is found in sGeneralSaveData
 _ValidateGeneralSaveData::
 	push de
 	call EnableSRAM
@@ -220,12 +221,8 @@ _ValidateGeneralSaveData::
 	cp 1
 	ret
 
-
 ; validates the general game data saved in SRAM
-; assumes that EnableSRAM was already called
-; preserves all registers except af
-; input:
-;	de = pointer to general game data in SRAM
+; de = pointer to general game data in SRAM
 ValidateGeneralSaveDataFromDE:
 	push hl
 	push bc
@@ -249,7 +246,7 @@ ValidateGeneralSaveDataFromDE:
 	ld a, [de]
 	inc de
 	ld [wGeneralSaveDataCheckSum + 1], a
-	pop de ; SRAM location from input
+	pop de
 
 	ld hl, sGeneralSaveDataHeaderEnd - sGeneralSaveData
 	add hl, de
@@ -313,7 +310,7 @@ ValidateGeneralSaveDataFromDE:
 	jr .loop
 
 .exit_loop
-	pop hl ; SRAM location from de input
+	pop hl
 	ld a, [hli]
 	sub $8
 	ld c, a
@@ -332,7 +329,7 @@ ValidateGeneralSaveDataFromDE:
 	ld hl, wNumSRAMValidationErrors
 	inc [hl]
 .no_header_error
-	pop de ; SRAM location from input
+	pop de
 	; copy play time minutes and hours
 	ld hl, (sPlayTimeCounter + 2) - sGeneralSaveData
 	add hl, de
@@ -354,29 +351,30 @@ ValidateGeneralSaveDataFromDE:
 	pop hl
 	ret
 
-
-; updates wTotalNumCardsCollected and wTotalNumCardsToCollect from save data
-; preserves all registers except af
-; input:
-;	de = sAlbumProgress
 LoadAlbumProgressFromSRAM:
 	push de
 	ld a, [de]
-	ld [wTotalNumCardsCollected], a
+	ld [wTotalNumCardsCollected + 0], a
 	inc de
 	ld a, [de]
-	ld [wTotalNumCardsToCollect], a
+	ld [wTotalNumCardsCollected + 1], a
+	inc de
+	ld a, [de]
+	ld [wTotalNumCardsToCollect + 0], a
+	inc de
+	ld a, [de]
+	ld [wTotalNumCardsToCollect + 1], a
 	pop de
 	ret
 
-
 ; first copies data from backup SRAM to main SRAM
 ; then loads it to WRAM from main SRAM
-; preserves de and hl
 LoadBackupSaveData:
 	push hl
 	push de
-	call DiscardSavedDuelData
+	call EnableSRAM
+	bank1call DiscardSavedDuelData
+	call DisableSRAM
 	call LoadBackupGeneralSaveData
 	call LoadBackupCardAndDeckSaveData
 	ld de, sGeneralSaveData
@@ -385,8 +383,6 @@ LoadBackupSaveData:
 	pop hl
 	ret
 
-
-; preserves all registers except af
 _LoadGeneralSaveData::
 	push de
 	ld de, sGeneralSaveData
@@ -394,15 +390,21 @@ _LoadGeneralSaveData::
 	pop de
 	ret
 
-
-; preserves all registers except af
-; input:
-;	de = pointer to save data in SRAM
+; de = pointer to save data
 LoadGeneralSaveDataFromDE:
 	push hl
 	push bc
-	push de
 	call EnableSRAM
+	call .LoadData
+	call DisableSRAM
+	pop bc
+	pop hl
+	ret
+
+.LoadData
+	push hl
+	push bc
+	push de
 	ld a, e
 	add sGeneralSaveDataHeaderEnd - sGeneralSaveData
 	ld [wTempPointer + 0], a
@@ -425,10 +427,10 @@ LoadGeneralSaveDataFromDE:
 
 ; copy bc bytes from wTempPointer to de
 	push hl
-	ld hl, wTempPointer
-	ld a, [hli]
-	ld h, [hl]
+	ld a, [wTempPointer + 0]
 	ld l, a
+	ld a, [wTempPointer + 1]
+	ld h, a
 .loop_copy
 	ld a, [hli]
 	ld [de], a
@@ -448,15 +450,16 @@ LoadGeneralSaveDataFromDE:
 	jr .asm_11459
 
 .done_copy
+	call EnableSRAM
 	ld a, [sAnimationsDisabled]
 	ld [wAnimationsDisabled], a
 	ld a, [sTextSpeed]
 	ld [wTextSpeed], a
+	call DisableSRAM
 	pop de
 	pop bc
 	pop hl
-	jp DisableSRAM
-
+	ret
 
 MACRO wram_sram_map
 	dw \1 ; WRAM address
@@ -465,9 +468,9 @@ MACRO wram_sram_map
 	db \4 ; max allowed value
 ENDM
 
-; maps WRAM addresses to SRAM addresses in order to save
-; and subsequently retrieve them on game load
-; also works as a test in order to check whether
+; maps WRAM addresses to SRAM addresses in order
+; to save and subsequently retrieve them on game load
+; also works as a test in order check whether
 ; the saved values is SRAM are legal, within the given value range
 WRAMToSRAMMapper:
 	wram_sram_map wMedalCount,                        1, $00, $ff ; sMedalCount
@@ -491,7 +494,6 @@ WRAMToSRAMMapper:
 	wram_sram_map wSelectedPauseMenuItem,             1, $00, $ff ; sSelectedPauseMenuItem
 	wram_sram_map wSelectedPCMenuItem,                1, $00, $ff ; sSelectedPCMenuItem
 	wram_sram_map wConfigCursorYPos,                  1, $00, $ff ; sConfigCursorYPos
-	wram_sram_map wSelectedGiftCenterMenuItem,        1, $00, $ff ; sSelectedGiftCenterMenuItem
 	wram_sram_map wPCPackSelection,                   1,   0,  14 ; sPCPackSelection
 	wram_sram_map wPCPacks,                NUM_PC_PACKS, $00, $ff ; sPCPacks
 	wram_sram_map wDefaultSong,                       1, $00, $ff ; sDefaultSong
@@ -500,7 +502,6 @@ WRAMToSRAMMapper:
 	wram_sram_map wMastersBeatenList,                10, $00, $ff ; sMastersBeatenList
 	wram_sram_map wNPCDuelistDirection,               1, $00, $ff ; sNPCDuelistDirection
 	wram_sram_map wMultichoiceTextboxResult_ChooseDeckToDuelAgainst, 1, $00, $ff ; sMultichoiceTextboxResult_ChooseDeckToDuelAgainst
-	wram_sram_map wGiftCenterChoice,                  1, $00, $ff ; sGiftCenterChoice
 	wram_sram_map .EmptySRAMSlot,                    15, $00, $ff ; sb84c
 	wram_sram_map .EmptySRAMSlot,                    16, $00, $ff ; sb85b
 	wram_sram_map .EmptySRAMSlot,                    16, $00, $ff ; sb86b
@@ -511,18 +512,15 @@ WRAMToSRAMMapper:
 .EmptySRAMSlot:
 	db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
-
-; saves the player's progress
-; preserves de
-; input:
-;	c = 0: save the player at their current position
-;	c !=0: save the player in Mason's lab
+; save the game
+; if c is 0, save the player at their current position
+; otherwise, save the player in Mason's lab
 _SaveGame::
 	ld a, c
 	or a
 	jr nz, .force_mason_lab
 	farcall BackupPlayerPosition
-	jr SaveAndBackupData
+	jr .save
 
 .force_mason_lab
 	ld a, $2
@@ -535,72 +533,23 @@ _SaveGame::
 	ld [wTempMap], a
 	ld a, OWMAP_MASON_LABORATORY
 	ld [wOverworldMapSelection], a
-;	fallthrough
 
-; preserves de
-; saves all data to SRAM, including General save data and Album/Deck data
-; and then backs up in SRAM2
-SaveAndBackupData:
-	push de
-	ld de, sGeneralSaveData
-	call SaveGeneralSaveDataFromDE
-	ld de, sAlbumProgress
-	call UpdateAlbumProgress
-	call WriteBackupGeneralSaveData
-	call WriteBackupCardAndDeckSaveData
-	pop de
-	ret
+.save
+	jp SaveAndBackupData
 
-
-; adds card with ID in register a to collection and updates album progress in RAM
-; preserves all registers except af
-; input:
-;	a = ID of the card to add to the player's collection
-_AddCardToCollectionAndUpdateAlbumProgress::
-	ld [wCardToAddToCollection], a
-	push hl
-	push bc
-	push de
-	ldh a, [hBankSRAM]
-	push af
-	ld a, BANK(sAlbumProgress)
-	call BankswitchSRAM
-	ld a, [wCardToAddToCollection]
-	call AddCardToCollection
-	ld de, sAlbumProgress
-	call UpdateAlbumProgress
-	pop af
-	call BankswitchSRAM
-	; unintentional? runs the same write operation
-	; on the same address but on the current SRAM bank
-;	ld a, [wCardToAddToCollection]
-;	call AddCardToCollection
-;	ld de, $b8fe ; still sAlbumProgress if SRAM2
-;	call UpdateAlbumProgress
-	pop de
-	pop bc
-	pop hl
-	ret
-
-
-; preserves de
 WriteBackupCardAndDeckSaveData:
 	ld bc, sCardAndDeckSaveDataEnd - sCardAndDeckSaveData
-	ld hl, sCardCollection
+	ld hl, sCardAndDeckSaveData
 	jr WriteDataToBackup
 
-; preserves de
 WriteBackupGeneralSaveData:
 	ld bc, sGeneralSaveDataEnd - sGeneralSaveData
 	ld hl, sGeneralSaveData
 ;	fallthrough
 
-; preserves de
-; input:
-;	bc = number of bytes to copy to backup
-;	hl = pointer in SRAM of data to backup
+; bc = number of bytes to copy to backup
+; hl = pointer in SRAM of data to backup
 WriteDataToBackup:
-	call EnableSRAM
 	ldh a, [hBankSRAM]
 	push af
 .loop
@@ -620,25 +569,19 @@ WriteDataToBackup:
 	call BankswitchSRAM
 	jp DisableSRAM
 
-
-; preserves de
 LoadBackupCardAndDeckSaveData:
 	ld bc, sCardAndDeckSaveDataEnd - sCardAndDeckSaveData
-	ld hl, sCardCollection
+	ld hl, sCardAndDeckSaveData
 	jr LoadDataFromBackup
 
-; preserves de
 LoadBackupGeneralSaveData:
 	ld bc, sGeneralSaveDataEnd - sGeneralSaveData
 	ld hl, sGeneralSaveData
 ;	fallthrough
 
-; preserves de
-; input:
-;	bc = number of bytes to load from backup
-;	hl = pointer to backup data in SRAM
+; bc = number of bytes to load from backup
+; hl = pointer in SRAM of backup data
 LoadDataFromBackup:
-	call EnableSRAM
 	ldh a, [hBankSRAM]
 	push af
 

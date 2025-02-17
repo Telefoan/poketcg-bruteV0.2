@@ -1,25 +1,24 @@
-; initializes scroll, window, and lcdc registers, sets trampoline functions
-; for the lcdc and vblank interrupts, latches clock data, and enables SRAM/RTC
-; preserves bc and de
+; initialize scroll, window, and lcdc registers, set trampoline functions
+; for the lcdc and vblank interrupts, latch clock data, and enable SRAM/RTC
 SetupRegisters::
 	xor a
 	ldh [rSCY], a
 	ldh [rSCX], a
 	ldh [rWY], a
 	ldh [rWX], a
+	ld [wcab0], a
+	ld [wcab1], a
+	ld [wcab2], a
 	ldh [hSCX], a
 	ldh [hSCY], a
 	ldh [hWX], a
 	ldh [hWY], a
-	ld hl, wcab0
-	ld [hli], a
-	ld [hli], a
-	ld [hl], a
+	xor a
 	ld [wReentrancyFlag], a
 	ld a, $c3            ; $c3 = jp nn
 	ld [wLCDCFunctionTrampoline], a
-	ld hl, wVBlankFunctionTrampoline
-	ld [hli], a
+	ld [wVBlankFunctionTrampoline], a
+	ld hl, wVBlankFunctionTrampoline + 1
 	ld [hl], LOW(NoOp)   ;
 	inc hl               ; load `jp NoOp`
 	ld [hl], HIGH(NoOp)  ;
@@ -32,17 +31,12 @@ SetupRegisters::
 NoOp::
 	ret
 
-
 ; sets wConsole and, if CGB, selects WRAM bank 1 and switches to double speed mode
 DetectConsole::
 	ld b, CONSOLE_CGB
 	cp GBC
 	jr z, .got_console
-	call DetectSGB
 	ld b, CONSOLE_DMG
-	jr nc, .got_console
-	call InitSGB
-	ld b, CONSOLE_SGB
 .got_console
 	ld a, b
 	ld [wConsole], a
@@ -52,8 +46,7 @@ DetectConsole::
 	ldh [rSVBK], a
 	jp SwitchToCGBDoubleSpeed
 
-
-; initializes the palettes (both monochrome and color)
+; initialize the palettes (both monochrome and color)
 SetupPalettes::
 	ld hl, wBGP
 	ld a, %11100100
@@ -73,7 +66,12 @@ SetupPalettes::
 .copy_pals_loop
 	ld hl, InitialPalette
 	ld b, CGB_PAL_SIZE
-	call CopyNBytesFromHLToDE
+.copy_bytes_loop
+	ld a, [hli]
+	ld [de], a
+	inc de
+	dec b
+	jr nz, .copy_bytes_loop
 	dec c
 	jr nz, .copy_pals_loop
 	jp FlushAllCGBPalettes
@@ -84,9 +82,7 @@ InitialPalette::
 	rgb 10, 10, 08
 	rgb 00, 00, 00
 
-
-; clears VRAM tile data ([wTileMapFill] should be an empty tile)
-; preserves de
+; clear VRAM tile data ([wTileMapFill] should be an empty tile)
 SetupVRAM::
 	call FillTileMap
 	call CheckForCGB
@@ -97,24 +93,16 @@ SetupVRAM::
 .vram0
 	ld hl, v0Tiles0
 	ld bc, v0BGMap0 - v0Tiles0
-;	fallthrough
-
-; preserves de
-; input:
-;	bc = number of bytes to clear
-;	hl = address from which to start clearing
-ClearData::
+.loop
 	xor a
 	ld [hli], a
 	dec bc
-	ld a, c
-	or b
-	jr nz, ClearData
+	ld a, b
+	or c
+	jr nz, .loop
 	ret
 
-
-; fills VRAM0 BG map 0 with [wTileMapFill] and VRAM1 BG map 0 with $00
-; preserves de
+; fill VRAM0 BG map 0 with [wTileMapFill] and VRAM1 BG map 0 with $00
 FillTileMap::
 	call BankswitchVRAM0
 	ld hl, v0BGMap0
@@ -132,19 +120,29 @@ FillTileMap::
 	call BankswitchVRAM1
 	ld hl, v1BGMap0
 	ld bc, v1BGMap1 - v1BGMap0
-	call ClearData
+.vram1_loop
+	xor a
+	ld [hli], a
+	dec bc
+	ld a, c
+	or b
+	jr nz, .vram1_loop
 	jp BankswitchVRAM0
 
-
-; zeroes work RAM, stack area, and high RAM ($C000-$DFFF, $FF80-$FFEF)
-; preserves de
+; zero work RAM, stack area, and high RAM ($C000-$DFFF, $FF80-$FFEF)
 ZeroRAM::
 	ld hl, $c000
 	ld bc, $e000 - $c000
-	call ClearData
+.zero_wram_loop
+	xor a
+	ld [hli], a
+	dec bc
+	ld a, c
+	or b
+	jr nz, .zero_wram_loop
 	ld c, LOW($ff80)
 	ld b, $fff0 - $ff80
-	; a = $00
+	xor a
 .zero_hram_loop
 	ld [$ff00+c], a
 	inc c

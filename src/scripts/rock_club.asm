@@ -118,3 +118,4 @@ Script_LostToGene:
 
 .ows_e09a
 	print_text_quit_fully Text07b0
+	ret

@@ -1,18 +1,45 @@
 ; AI for Sam's practice duel, which handles his scripted actions.
 ; will act as a normal duelist AI after turn 7.
 AIActionTable_SamPractice:
-	dw AIDoTurn_SamsPractice              ; .do_turn (unused)
-	dw AIDoTurn_SamsPractice              ; .do_turn
-	dw SetSamsStartingPlayArea            ; .start_duel
-	dw AIDecideForcedSwitch_SamsPractice  ; .forced_switch
-	dw AIDecideSwitchAfterKO_SamsPractice ; .ko_switch
-	dw AIPickPrizeCards                   ; .take_prize
+	dw .do_turn ; unused
+	dw .do_turn
+	dw .start_duel
+	dw .forced_switch
+	dw .ko_switch
+	dw .take_prize
 
+.do_turn
+	call IsAIPracticeScriptedTurn
+	jr nc, .scripted_1
+; not scripted, use AI main turn logic
+	jp AIMainTurnLogic
+.scripted_1 ; use scripted actions instead
+	jp AIPerformScriptedTurn
 
-; used to know whether Sam's AI is still doing scripted turns.
-; preserves all registers except af
-; output:
-;	carry = set:  if the AI has taken at least 7 turns
+.start_duel
+	jp SetSamsStartingPlayArea
+
+.forced_switch
+	call IsAIPracticeScriptedTurn
+	jr nc, .scripted_2
+	jp AIDecideBenchPokemonToSwitchTo
+.scripted_2
+	jp PickRandomBenchPokemon
+
+.ko_switch:
+	call IsAIPracticeScriptedTurn
+	jr nc, .scripted_3
+	jp AIDecideBenchPokemonToSwitchTo
+.scripted_3
+	jp GetPlayAreaLocationOfRaticateOrRattata
+
+.take_prize:
+	jp AIPickPrizeCards
+
+; returns carry if number of turns
+; the AI has taken >= 7.
+; used to know whether AI Sam is still
+; doing scripted turns.
 IsAIPracticeScriptedTurn:
 	ld a, [wDuelTurns]
 	srl a
@@ -20,9 +47,8 @@ IsAIPracticeScriptedTurn:
 	ccf
 	ret
 
-
-; puts one Machop from the hand into the play area
-; and sets the number of Prize cards to 2.
+; places one Machop from the hand to the Play Area
+; and sets the number of prizes to 2.
 SetSamsStartingPlayArea:
 	call CreateHandCardList
 	ld hl, wDuelTempList
@@ -31,8 +57,12 @@ SetSamsStartingPlayArea:
 	ldh [hTempCardIndex_ff98], a
 	cp $ff
 	ret z
-	call _GetCardIDFromDeckIndex
-	cp MACHOP
+	call LoadCardDataToBuffer1_FromDeckIndex
+	ld a, [wLoadedCard1ID + 0]
+	ld e, a
+	ld a, [wLoadedCard1ID + 1]
+	ld d, a
+	cp16 MACHOP
 	jr nz, .loop_hand
 	ldh a, [hTempCardIndex_ff98]
 	call PutHandPokemonCardInPlayArea
@@ -40,27 +70,41 @@ SetSamsStartingPlayArea:
 	ld [wDuelInitialPrizes], a
 	ret
 
+; outputs in a Play Area location of Raticate or Rattata
+; in the Bench. If neither is found, just output PLAY_AREA_BENCH_1.
+GetPlayAreaLocationOfRaticateOrRattata:
+	ld de, RATICATE
+	ld b, PLAY_AREA_BENCH_1
+	call LookForCardIDInPlayArea_Bank5
+	cp $ff
+	jr nz, .found
+	ld de, RATTATA
+	ld b, PLAY_AREA_BENCH_1
+	call LookForCardIDInPlayArea_Bank5
+	cp $ff
+	jr nz, .found
+	ld a, PLAY_AREA_BENCH_1
+.found
+	ldh [hTempPlayAreaLocation_ff9d], a
+	ret
 
-AIDoTurn_SamsPractice:
-	call IsAIPracticeScriptedTurn
-	jp c, AIMainTurnLogic ; use default logic if no longer scripted
-;	fallthrough
-
-; has AI execute some scripted actions depending on the current turn number.
+; has AI execute some scripted actions depending on Duel turn.
 AIPerformScriptedTurn:
 	ld a, [wDuelTurns]
 	srl a
 	ld hl, .scripted_actions_list
 	call JumpToFunctionInTable
 
-; always attack with the Active Pokémon's first attack.
-; if it's unusable, then end the turn without attacking.
+; always attack with Arena card's first attack.
+; if it's unusable end turn without attacking.
 	xor a
 	ldh [hTempPlayAreaLocation_ff9d], a ; PLAY_AREA_ARENA
 	ld [wSelectedAttack], a ; FIRST_ATTACK_OR_PKMN_POWER
 	call CheckIfSelectedAttackIsUnusable
-	jp nc, AITryUseAttack
-	; unusable
+	jr c, .unusable
+	jp AITryUseAttack
+
+.unusable
 	ld a, OPPACTION_FINISH_NO_ATTACK
 	bank1call AIMakeDecision
 	ret
@@ -75,100 +119,66 @@ AIPerformScriptedTurn:
 	dw .turn_7
 
 .turn_1
-	lb de, MACHOP, FIGHTING_ENERGY
+	ld bc, MACHOP
+	ld de, FIGHTING_ENERGY
+	call AIAttachEnergyInHandToCardInPlayArea
 	jp AIAttachEnergyInHandToCardInPlayArea
 
 .turn_2
-	ld a, RATTATA
+	ld de, RATTATA
 	call LookForCardIDInHandList_Bank5
 	ldh [hTemp_ffa0], a
 	ld a, OPPACTION_PLAY_BASIC_PKMN
 	bank1call AIMakeDecision
-	lb de, RATTATA, FIGHTING_ENERGY
+	ld bc, RATTATA
+	ld de, FIGHTING_ENERGY
 	jp AIAttachEnergyInHandToCardInPlayArea
 
 .turn_3
-	ld a, RATTATA
+	ld de, RATTATA
 	ld b, PLAY_AREA_ARENA
 	call LookForCardIDInPlayArea_Bank5
 	ldh [hTempPlayAreaLocation_ffa1], a
-	ld a, RATICATE
+	ld de, RATICATE
 	call LookForCardIDInHandList_Bank5
 	ldh [hTemp_ffa0], a
 	ld a, OPPACTION_EVOLVE_PKMN
 	bank1call AIMakeDecision
-	lb de, RATICATE, LIGHTNING_ENERGY
+	ld bc, RATICATE
+	ld de, LIGHTNING_ENERGY
 	jp AIAttachEnergyInHandToCardInPlayArea
 
 .turn_4
-	lb de, RATICATE, LIGHTNING_ENERGY
+	ld bc, RATICATE
+	ld de, LIGHTNING_ENERGY
 	jp AIAttachEnergyInHandToCardInPlayArea
 
 .turn_5
-	ld a, MACHOP
+	ld de, MACHOP
 	call LookForCardIDInHandList_Bank5
 	ldh [hTemp_ffa0], a
 	ld a, OPPACTION_PLAY_BASIC_PKMN
 	bank1call AIMakeDecision
-	lb de, MACHOP, FIGHTING_ENERGY
+	ld bc, MACHOP
+	ld de, FIGHTING_ENERGY
 	call AIAttachEnergyInHandToCardInBench
 
 	ld a, DUELVARS_ARENA_CARD
-	get_turn_duelist_var
-	call _GetCardIDFromDeckIndex
-	cp MACHOP
+	call GetTurnDuelistVariable
+	cp16 MACHOP ; wrong
 	ld a, PLAY_AREA_BENCH_1
 	jr nz, .retreat
 	inc a ; PLAY_AREA_BENCH_2
+
 .retreat
 	jp AITryToRetreat
 
 .turn_6
-	lb de, MACHOP, FIGHTING_ENERGY
+	ld bc, MACHOP
+	ld de, FIGHTING_ENERGY
 	jp AIAttachEnergyInHandToCardInPlayArea
 
 .turn_7
-	lb de, MACHOP, FIGHTING_ENERGY
+	ld bc, MACHOP
+	ld de, FIGHTING_ENERGY
 	jp AIAttachEnergyInHandToCardInPlayArea
-
-
-AIDecideForcedSwitch_SamsPractice:
-	call IsAIPracticeScriptedTurn
-	jp c, AIDecideBenchPokemonToSwitchTo ; use default logic if no longer scripted
-;	fallthrough
-
-; picks a random Pokémon on the Bench.
-; preserves bc and de
-; output:
-;	a = play area location offset of the Benched Pokémon that was chosen (PLAY_AREA_* constant)
-PickRandomBenchPokemon:
-	ld a, DUELVARS_NUMBER_OF_POKEMON_IN_PLAY_AREA
-	get_turn_duelist_var
-	dec a
-	call Random
-	inc a
-	ret
-
-
-AIDecideSwitchAfterKO_SamsPractice:
-	call IsAIPracticeScriptedTurn
-	jp c, AIDecideBenchPokemonToSwitchTo ; use default logic if no longer scripted
-;	fallthrough
-
-; preserves de
-; output:
-;	a = play area location offset of a Benched Raticate or Rattata
-;	  = PLAY_AREA_BENCH_1:  if there are no Rattata or Raticate on the Bench
-.GetPlayAreaLocationOfRaticateOrRattata
-	ld a, RATICATE
-	ld b, PLAY_AREA_BENCH_1
-	call LookForCardIDInPlayArea_Bank5
-	jr c, .found
-	ld a, RATTATA
-	ld b, PLAY_AREA_BENCH_1
-	call LookForCardIDInPlayArea_Bank5
-	jr c, .found
-	ld a, PLAY_AREA_BENCH_1
-.found
-	ldh [hTempPlayAreaLocation_ff9d], a
-	ret

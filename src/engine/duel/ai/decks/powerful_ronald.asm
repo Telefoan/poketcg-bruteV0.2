@@ -1,10 +1,13 @@
 AIActionTable_PowerfulRonald:
-	dw AIMainTurnLogic                ; .do_turn (unused)
-	dw AIMainTurnLogic                ; .do_turn
+	dw .do_turn ; unused
+	dw .do_turn
 	dw .start_duel
-	dw AIDecideBenchPokemonToSwitchTo ; .forced_switch
-	dw AIDecideBenchPokemonToSwitchTo ; .ko_switch
-	dw AIPickPrizeCards               ; .take_prize
+	dw .forced_switch
+	dw .ko_switch
+	dw .take_prize
+
+.do_turn
+	jp AIMainTurnLogic
 
 .start_duel
 	call InitAIDuelVars
@@ -14,37 +17,46 @@ AIActionTable_PowerfulRonald:
 	ret nc
 	jp AIPlayInitialBasicCards
 
+.forced_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.ko_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.take_prize
+	jp AIPickPrizeCards
+
 .list_arena
-	db KANGASKHAN
-	db ELECTABUZZ_LV35
-	db HITMONCHAN
-	db MR_MIME
-	db LICKITUNG
-	db HITMONLEE
-	db TAUROS
-	db JYNX
-	db MEWTWO_LV53
-	db DODUO
-	db $00
+	dw KANGASKHAN
+	dw ELECTABUZZ_LV35
+	dw HITMONCHAN
+	dw MR_MIME
+	dw LICKITUNG
+	dw HITMONLEE
+	dw TAUROS
+	dw JYNX
+	dw MEWTWO_LV53
+	dw DODUO
+	dw NULL
 
 .list_bench
-	db KANGASKHAN
-	db HITMONLEE
-	db HITMONCHAN
-	db TAUROS
-	db DODUO
-	db JYNX
-	db MEWTWO_LV53
-	db ELECTABUZZ_LV35
-	db MR_MIME
-	db LICKITUNG
-	db $00
+	dw KANGASKHAN
+	dw HITMONLEE
+	dw HITMONCHAN
+	dw TAUROS
+	dw DODUO
+	dw JYNX
+	dw MEWTWO_LV53
+	dw ELECTABUZZ_LV35
+	dw MR_MIME
+	dw LICKITUNG
+	dw NULL
 
 .list_retreat
 	ai_retreat KANGASKHAN, -1
 	ai_retreat DODUO,      -1
 	ai_retreat DODRIO,     -1
-	db $00
+	dw NULL
 
 .list_energy
 	ai_energy ELECTABUZZ_LV35, 2, +1
@@ -58,18 +70,18 @@ AIActionTable_PowerfulRonald:
 	ai_energy LICKITUNG,       2, +0
 	ai_energy KANGASKHAN,      4, -1
 	ai_energy TAUROS,          3, +0
-	db $00
+	dw NULL
 
 .list_prize
-	db GAMBLER
-	db ENERGY_REMOVAL
-	db $00
+	dw GAMBLER
+	dw ENERGY_REMOVAL
+	dw NULL
 
 .store_list_pointers
 	store_list_pointer wAICardListAvoidPrize, .list_prize
 	store_list_pointer wAICardListArenaPriority, .list_arena
 	store_list_pointer wAICardListBenchPriority, .list_bench
 	store_list_pointer wAICardListPlayFromHandPriority, .list_bench
-	store_list_pointer wAICardListRetreatBonus, .list_retreat
+	; missing store_list_pointer wAICardListRetreatBonus, .list_retreat
 	store_list_pointer wAICardListEnergyBonus, .list_energy
 	ret

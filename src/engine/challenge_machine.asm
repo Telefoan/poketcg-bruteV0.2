@@ -1,24 +1,22 @@
 ChallengeMachine_Reset:
 	call ChallengeMachine_Initialize
 	call EnableSRAM
-	ld hl, sPlayerInChallengeMachine
 	xor a
-	ld [hli], a
-	ld [hli], a ; sTotalChallengeMachineWins
-	ld [hli], a
-	ld [hli], a ; sPresentConsecutiveWins
-	ld [hli], a
-	ld [hli], a ; sPresentConsecutiveWinsBackup
-	ld [hl], a
+	ld [sTotalChallengeMachineWins], a
+	ld [sTotalChallengeMachineWins + 1], a
+	ld [sPresentConsecutiveWins], a
+	ld [sPresentConsecutiveWins + 1], a
+	ld [sPresentConsecutiveWinsBackup], a
+	ld [sPresentConsecutiveWinsBackup + 1], a
+	ld [sPlayerInChallengeMachine], a
 	jp DisableSRAM
 
-
-; if a challenge is already in progress, then resume the challenge.
-; otherwise, start a new challenge with 5 rounds.
+; if a challenge is already in progress, then resume
+; otherwise, start a new 5 round challenge
 ChallengeMachine_Start::
 	xor a ; DOUBLE_SPACED
 	ld [wLineSeparation], a
-	call LoadConsolePaletteData
+	ld [wd317], a
 	call ChallengeMachine_Initialize
 
 	call EnableSRAM
@@ -70,8 +68,8 @@ ChallengeMachine_Start::
 	call EnableSRAM
 	xor a
 	ld [sPlayerInChallengeMachine], a
-	call DiscardSavedDuelData
-;	call DisableSRAM ; already called during DiscardSavedDuelData 
+	bank1call DiscardSavedDuelData
+	call DisableSRAM
 	call ChallengeMachine_GetCurrentOpponent
 	call ChallengeMachine_RecordDuelResult
 	call ChallengeMachine_DrawOpponentList
@@ -112,10 +110,9 @@ ChallengeMachine_Start::
 	call EnableSRAM
 	ld a, [sChallengeMachineOpponentNumber]
 	inc a
-	ld hl, wTxRam3
-	ld [hli], a
+	ld [wTxRam3], a
 	xor a
-	ld [hl], a
+	ld [wTxRam3 + 1], a
 	call DisableSRAM
 	call ChallengeMachine_GetOpponentNameAndDeck
 	ld a, [wOpponentName]
@@ -137,6 +134,7 @@ ChallengeMachine_Start::
 	ld [sPresentConsecutiveWins + 1], a
 	call DisableSRAM
 .end_challenge ; end, win or lose
+	call ChallengeMachine_CheckForNewRecord ; redundant?
 	call EnableSRAM
 	ld a, [sPresentConsecutiveWins]
 	ld [sPresentConsecutiveWinsBackup], a
@@ -147,15 +145,8 @@ ChallengeMachine_Start::
 	ldtx hl, WeAwaitYourNextChallengeText
 	jp PrintScrollableText_NoTextBoxLabel
 
-
-; updates wChallengeMachineOpponent with the current
+; update wChallengeMachineOpponent with the current
 ; opponent in the sChallengeMachineOpponents list
-; preserves bc
-; input:
-;	sChallengeMachineOpponents = list with indices for ChallengeMachine_OpponentDeckIDs
-;	[sChallengeMachineOpponentNumber] = position in the current challenge (0-4)
-; output:
-;	[wChallengeMachineOpponent] = ChallengeMachine_OpponentDeckIDs index for next opponent
 ChallengeMachine_GetCurrentOpponent:
 	call EnableSRAM
 	ld a, [sChallengeMachineOpponentNumber]
@@ -167,11 +158,8 @@ ChallengeMachine_GetCurrentOpponent:
 	ld [wChallengeMachineOpponent], a
 	jp DisableSRAM
 
-
-; plays the appropriate match start theme,
-; then initiates a duel with the current opponent
-; input:
-;	[sChallengeMachineOpponentNumber] = position in the current challenge (0-4)
+; play the appropriate match start theme
+; then duel the current opponent
 ChallengeMachine_Duel:
 	call ChallengeMachine_PrepareDuel
 	call EnableSRAM
@@ -197,14 +185,7 @@ ChallengeMachine_SongIDs:
 	db MUSIC_MATCH_START_2
 	db MUSIC_MATCH_START_2
 
-
 ; get the current opponent's name, deck, and prize count
-; preserves bc
-; input:
-;	[sChallengeMachineOpponentNumber] = position in the current challenge (0-4)
-;	[wChallengeMachineOpponent] = index for ChallengeMachine_OpponentDeckIDs
-; output:
-;	[wNPCDuelPrizes] = number of Prize cards to use in the upcoming duel
 ChallengeMachine_PrepareDuel:
 	call ChallengeMachine_GetOpponentNameAndDeck
 	call EnableSRAM
@@ -225,17 +206,8 @@ ChallengeMachine_Prizes:
 	db PRIZES_6
 	db PRIZES_6
 
-
-; stores the result of the last duel in the current
+; store the result of the last duel in the current
 ; position of the sChallengeMachineDuelResults list
-; preserves bc
-; input:
-;	[sChallengeMachineOpponentNumber] = position in the current challenge (0-4)
-;	[wDuelResult] = outcome of last duel (0 = win, 1 = loss)
-; output:
-;	[sChallengeMachineDuelResults + sChallengeMachineOpponentNumber] = 1:  if the Player won the duel
-;	[sChallengeMachineDuelResults + sChallengeMachineOpponentNumber] = 2:  if the Player lost the duel
-;	[sPresentConsecutiveWins] += 1:  if the Player won the duel
 ChallengeMachine_RecordDuelResult:
 	call EnableSRAM
 	ld a, [sChallengeMachineOpponentNumber]
@@ -245,20 +217,20 @@ ChallengeMachine_RecordDuelResult:
 	add hl, de
 	ld a, [wDuelResult]
 	or a
-	jr z, .won
-	ld a, 2 ; lost
-	ld [hl], a
-	jp DisableSRAM
-.won
+	jr nz, .lost
 	ld a, 1 ; won
 	ld [hl], a
 	call DisableSRAM
 	ld hl, sPresentConsecutiveWins
-;	fallthrough
+	jp ChallengeMachine_IncrementHLMax999
 
-; increments the value at hl without going above 999
-; input:
-;	[hl] = number to increase by 1
+.lost
+	ld a, 2 ; lost
+	ld [hl], a
+	jp DisableSRAM
+
+; increment the value at hl
+; without going above 999
 ChallengeMachine_IncrementHLMax999:
 	call EnableSRAM
 	inc hl
@@ -267,7 +239,7 @@ ChallengeMachine_IncrementHLMax999:
 	jr nz, .increment
 	ld a, [hl]
 	cp LOW(999)
-	jp z, DisableSRAM ; done
+	jr z, .skip
 .increment
 	ld a, [hl]
 	add 1
@@ -275,10 +247,10 @@ ChallengeMachine_IncrementHLMax999:
 	ld a, [hl]
 	adc 0
 	ld [hl], a
+.skip
 	jp DisableSRAM
 
-
-; updates sMaximumConsecutiveWins if the player set a new record
+; update sMaximumConsecutiveWins if the player set a new record
 ChallengeMachine_CheckForNewRecord:
 	call EnableSRAM
 	ld hl, sMaximumConsecutiveWins + 1
@@ -290,8 +262,8 @@ ChallengeMachine_CheckForNewRecord:
 	ld a, [sPresentConsecutiveWins]
 	cp [hl]
 .high_bytes_different
-	jp c, DisableSRAM ; no record
-	jp z, DisableSRAM ; no record
+	jr c, .no_record
+	jr z, .no_record
 ; new record
 	ld hl, sMaximumConsecutiveWins
 	ld a, [sPresentConsecutiveWins]
@@ -300,19 +272,16 @@ ChallengeMachine_CheckForNewRecord:
 	ld [hl], a
 	ld hl, sPlayerName
 	ld de, sChallengeMachineRecordHolderName
-	ld b, NAME_BUFFER_LENGTH
-	call CopyNBytesFromHLToDE
+	ld bc, NAME_BUFFER_LENGTH
+	call CopyDataHLtoDE_SaveRegisters
 ; remember to show congrats message later
 	ld a, TRUE
 	ld [sConsecutiveWinRecordIncreased], a
+.no_record
 	jp DisableSRAM
 
-
-; prints the next opponent's name and asks the
+; print the next opponent's name and ask the
 ; player if they want to begin the next duel
-; input:
-;	[sChallengeMachineOpponentNumber] = position in the current challenge (0-4)
-;	[sPresentConsecutiveWins] = current win streak (2 bytes)
 ChallengeMachine_AreYouReady:
 	call EnableSRAM
 	ld a, [sChallengeMachineOpponentNumber]
@@ -337,29 +306,26 @@ ChallengeMachine_AreYouReady:
 	ld [wTxRam3 + 1], a
 .no_streak
 	call DisableSRAM
-	push hl ; text ID
+	push hl ; text id
 	call ChallengeMachine_GetOpponentNameAndDeck
 	ld a, [wOpponentName]
 	ld [wTxRam2], a
 	ld a, [wOpponentName + 1]
 	ld [wTxRam2 + 1], a
-	pop hl ; text ID
+	pop hl ; text id
 	call PrintScrollableText_NoTextBoxLabel
 	ldtx hl, WouldYouLikeToBeginTheDuelText
 	jp YesOrNoMenuWithText_SetCursorToYes
 
-
-; prints opponent win count and plays a jingle for beating 5 opponents
-; input:
-;	[sChallengeMachineOpponentNumber] = position in the current challenge (0-4)
+; print opponent win count
+; play a jingle for beating 5 opponents
 ChallengeMachine_DuelWon:
 	call EnableSRAM
 	ld a, [sChallengeMachineOpponentNumber]
 	inc a
-	ld hl, wTxRam3
-	ld [hli], a
+	ld [wTxRam3], a
 	xor a
-	ld [hl], a
+	ld [wTxRam3 + 1], a
 	ldtx hl, WonAgainstXOpponentsText
 	ld a, [sChallengeMachineOpponentNumber]
 	call DisableSRAM
@@ -376,10 +342,8 @@ ChallengeMachine_DuelWon:
 	call WaitForSongToFinish
 	jp ResumeSong
 
-
-; when a player's streak ends, this is called to print the final consecutive win count
-; input:
-;	[sPresentConsecutiveWins] = current win streak (2 bytes)
+; when a player's streak ends, print the final
+; consecutive win count
 ChallengeMachine_PrintFinalConsecutiveWinStreak:
 	call EnableSRAM
 	ld a, [sPresentConsecutiveWins]
@@ -390,17 +354,15 @@ ChallengeMachine_PrintFinalConsecutiveWinStreak:
 	jr nz, .streak
 	ld a, [sPresentConsecutiveWins]
 	cp 2
-	jp c, DisableSRAM ; no streak
+	jr c, .no_streak
 .streak
 	ldtx hl, ConsecutiveWinsEndedAtText
 	call PrintScrollableText_NoTextBoxLabel
+.no_streak
 	jp DisableSRAM
 
-
-; plays a jingle if the player achieved a new record
-; input:
-;	[sConsecutiveWinRecordIncreased] = 0:  return without doing anything
-;	[sMaximumConsecutiveWins] = current high score
+; if the player achieved a new record, play a jingle
+; otherwise, do nothing
 ChallengeMachine_ShowNewRecord:
 	call EnableSRAM
 	ld a, [sConsecutiveWinRecordIncreased]
@@ -419,7 +381,6 @@ ChallengeMachine_ShowNewRecord:
 	call WaitForSongToFinish
 	jp ResumeSong
 
-
 ChallengeMachine_DrawScoreScreen:
 	call InitMenuScreen
 	lb de, $30, $bf
@@ -433,52 +394,16 @@ ChallengeMachine_DrawScoreScreen:
 	call EnableSRAM
 	ld hl, sChallengeMachineRecordHolderName
 	ld de, wDefaultText
-	ld b, NAME_BUFFER_LENGTH
-	call CopyNBytesFromHLToDE
+	ld bc, NAME_BUFFER_LENGTH
+	call CopyDataHLtoDE
 	call DisableSRAM
-	; zero wTxRam2 so that the name just loaded to wDefaultText is printed
-	ld hl, wTxRam2
 	xor a
-	ld [hli], a
-	ld [hl], a
+	ld [wTxRam2], a
+	ld [wTxRam2 + 1], a
 	ld hl, ChallengeMachine_PlayerScoreLabels
 	call PrintLabels
 	ld hl, ChallengeMachine_PlayerScoreValues
-;	fallthrough
-
-; prints all scores in the table pointed to by hl
-; input:
-;	hl = pointer for a $0000 terminated table with the following format:
-;	     2-byte pointer for a 16-bit number in SRAM, x coordinate, y coordinate
-ChallengeMachine_PrintScores:
-.loop
-	call EnableSRAM
-	ld a, [hli]
-	ld e, a
-	ld a, [hli]
-	ld d, a
-	or e
-	jp z, DisableSRAM; done
-	ld b, [hl]
-	inc hl
-	ld c, [hl]
-	inc hl
-	push hl
-	push bc
-	ld a, [de]
-	ld l, a
-	inc de
-	ld a, [de]
-	ld h, a
-	call ThreeDigitNumberToTxSymbol_TrimLeadingZeros
-	pop bc
-	call BCCoordToBGMap0Address
-	ld hl, wDecimalChars
-	ld b, 3
-	call SafeCopyDataHLtoDE
-	pop hl
-	jr .loop
-
+	jp ChallengeMachine_PrintScores
 
 ChallengeMachine_PlayerScoreLabels:
 	db 1, 0
@@ -503,7 +428,6 @@ ChallengeMachine_PlayerScoreLabels:
 	tx WinsText
 	db $ff
 
-
 ChallengeMachine_PlayerScoreValues:
 	dw sTotalChallengeMachineWins
 	db 12, 4
@@ -515,7 +439,6 @@ ChallengeMachine_PlayerScoreValues:
 	db 13, 10
 
 	dw NULL
-
 
 ChallengeMachine_DrawOpponentList:
 	call InitMenuScreen
@@ -530,46 +453,7 @@ ChallengeMachine_DrawOpponentList:
 	ld hl, ChallengeMachine_OpponentNumberLabels
 	call PrintLabels
 	call ChallengeMachine_PrintOpponentInfo
-;	fallthrough
-
-; input:
-;	sChallengeMachineDuelResults = list of wins/losses (1 = win, 2 = loss, 0 = duel pending)
-ChallengeMachine_PrintDuelResultIcons:
-	ld hl, sChallengeMachineDuelResults
-	ld c, NUM_CHALLENGE_MACHINE_OPPONENTS ; loop counter
-	lb de, 1, 2 ; starting screen coordinates
-.print_loop
-	push hl
-	push bc
-	push de
-	call InitTextPrinting
-	call EnableSRAM
-	ld a, [hl]
-	add a
-	ld e, a
-	ld d, 0
-	ld hl, ChallengeMachine_DuelResultIcons
-	add hl, de
-	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	call PrintTextNoDelay
-	pop de
-	pop bc
-	pop hl
-	inc hl
-	; down two rows
-	inc e
-	inc e
-	dec c
-	jr nz, .print_loop
-	jp DisableSRAM
-
-ChallengeMachine_DuelResultIcons:
-	tx ChallengeMachineNotDuelledIconText
-	tx ChallengeMachineDuelWonIconText
-	tx ChallengeMachineDuelLostIconText
-
+	jp ChallengeMachine_PrintDuelResultIcons
 
 ChallengeMachine_OpponentNumberLabels:
 	db 1, 0
@@ -591,13 +475,10 @@ ChallengeMachine_OpponentNumberLabels:
 	tx ChallengeMachineOpponent5Text
 	db $ff
 
-
-; input:
-;	sChallengeMachineOpponents = list with indices for ChallengeMachine_OpponentDeckIDs
 ChallengeMachine_PrintOpponentInfo:
 	ld hl, sChallengeMachineOpponents
-	lb bc, 0, 2 ; starting screen coordinates
-	ld e, NUM_CHALLENGE_MACHINE_OPPONENTS ; loop counter
+	ld bc, 2 ; beginning y-pos
+	ld e, NUM_CHALLENGE_MACHINE_OPPONENTS
 .loop
 	push hl
 	push bc
@@ -605,28 +486,23 @@ ChallengeMachine_PrintOpponentInfo:
 	call EnableSRAM
 	ld a, [hl]
 	ld [wChallengeMachineOpponent], a
-	ld b, 14 ; x-position
+	ld b, 14 ; x-pos
 	call ChallengeMachine_PrintOpponentName
-	ld b, 4 ; x-position
+	ld b, 4 ; x-pos
 	call ChallengeMachine_PrintOpponentClubStatus
 	pop de
 	pop bc
 	pop hl
-	inc hl ; next opponent
-	; move down two rows
+	inc hl
+
+; down two rows
 	inc c
 	inc c
-	dec e ; decrement loop counter
+
+	dec e
 	jr nz, .loop
 	jp DisableSRAM
 
-
-; preserves bc
-; input:
-;	bc = screen coordinates at which to start printing the text
-;	[wChallengeMachineOpponent] = index for ChallengeMachine_OpponentDeckIDs
-; output:
-;	de = screen coordinates from input bc
 ChallengeMachine_PrintOpponentName:
 	push bc
 	call ChallengeMachine_GetOpponentNameAndDeck
@@ -636,12 +512,6 @@ ChallengeMachine_PrintOpponentName:
 	pop bc
 	ret
 
-
-; input:
-;	bc = screen coordinates at which to start printing the text
-;	[hl] = text ID
-; output:
-;	de = screen coordinates from input bc
 ChallengeMachine_PrintText:
 	ld a, [hli]
 	ld h, [hl]
@@ -649,15 +519,12 @@ ChallengeMachine_PrintText:
 	ld e, c
 	ld d, b
 	push de
-	call InitTextPrinting_PrintTextNoDelay
+	call InitTextPrinting
+	call PrintTextNoDelay
 	pop de
 	ret
 
-
-; prints the opponent's rank (e.g. Club Member) and element (Club's Energy Symbol)
-; preserves bc
-; input:
-;	[wChallengeMachineOpponent] = index for ChallengeMachine_OpponentDeckIDs
+; print the opponent's rank and element
 ChallengeMachine_PrintOpponentClubStatus:
 	push bc
 	call ChallengeMachine_GetOpponentNameAndDeck
@@ -668,6 +535,7 @@ ChallengeMachine_PrintOpponentClubStatus:
 	ld a, d
 	add $07
 	ld d, a
+	call InitTextPrinting
 	pop hl
 	ld bc, 8 ; element
 	add hl, bc
@@ -675,16 +543,11 @@ ChallengeMachine_PrintOpponentClubStatus:
 	ld h, [hl]
 	ld l, a
 	or h
-	call nz, InitTextPrinting_PrintTextNoDelay
+	call nz, PrintTextNoDelay
+.no_element
 	pop bc
 	ret
 
-
-; preserves bc and de
-; input:
-;	[wChallengeMachineOpponent] = index for ChallengeMachine_OpponentDeckIDs
-; output:
-;	hl = pointer for an entry from DeckIDDuelConfigurations
 ChallengeMachine_GetOpponentNameAndDeck:
 	push de
 	ld a, [wChallengeMachineOpponent]
@@ -698,9 +561,80 @@ ChallengeMachine_GetOpponentNameAndDeck:
 	pop de
 	ret
 
+ChallengeMachine_PrintDuelResultIcons:
+	ld hl, sChallengeMachineDuelResults
+	ld c, NUM_CHALLENGE_MACHINE_OPPONENTS
+	lb de, 1, 2
+.print_loop
+	push hl
+	push bc
+	push de
+	call InitTextPrinting
+	call EnableSRAM
+	ld a, [hl]
+	add a
+	ld e, a
+	ld d, 0
+	ld hl, ChallengeMachine_DuelResultIcons
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	call PrintTextNoDelay
+	pop de
+	pop bc
+	pop hl
+	inc hl
 
-; if this is the first time the Challenge Machine has ever been used on this cartridge,
-; then clear all variables and set Dr. Mason as the record holder.
+; down two rows
+	inc e
+	inc e
+
+	dec c
+	jr nz, .print_loop
+	jp DisableSRAM
+
+ChallengeMachine_DuelResultIcons:
+	tx ChallengeMachineNotDuelledIconText
+	tx ChallengeMachineDuelWonIconText
+	tx ChallengeMachineDuelLostIconText
+
+; print all scores in the table pointed to by hl
+ChallengeMachine_PrintScores:
+.loop
+	call EnableSRAM
+	ld a, [hli]
+	ld e, a
+	ld a, [hli]
+	ld d, a
+	or e
+	jr z, .done
+	ld b, [hl]
+	inc hl
+	ld c, [hl]
+	inc hl
+	push hl
+	push bc
+	ld a, [de]
+	ld l, a
+	inc de
+	ld a, [de]
+	ld h, a
+	call ConvertWordToNumericalDigits
+	pop bc
+	call BCCoordToBGMap0Address
+	ld hl, wDecimalChars
+	ld b, 3
+	call SafeCopyDataHLtoDE
+	pop hl
+	jr .loop
+
+.done
+	jp DisableSRAM
+
+; if this is the first time the challenge machine has ever
+; been used on this cartridge, then clear all vars and
+; set Dr. Mason as the record holder
 ChallengeMachine_Initialize:
 	call EnableSRAM
 	ld a, [sChallengeMachineMagic]
@@ -740,11 +674,7 @@ ChallengeMachine_Initialize:
 ChallengeMachine_DrMasonText:
 	text "Dr. Mason", TX_END, TX_END, TX_END, TX_END, TX_END, TX_END
 
-
-; picks the next opponent sequence and clears challenge variables
-; preserves de
-; output:
-;	sChallengeMachineOpponents = list with (5) indices for ChallengeMachine_OpponentDeckIDs
+; pick the next opponent sequence and clear challenge vars
 ChallengeMachine_PickOpponentSequence:
 	call EnableSRAM
 
@@ -814,14 +744,8 @@ ChallengeMachine_FinalOpponentProbabilities:
 	db   8, GRAND_MASTERS_START + 6 ;  8/256, aaron
 	db 255, GRAND_MASTERS_START + 7 ;  8/256, imakuni (catch-all)
 
-
-; preserves de
-; input:
-;	a = index for ChallengeMachine_OpponentDeckIDs
-;	c = how many entries need to be checked for duplicates
-;	sChallengeMachineOpponents = list with indices for ChallengeMachine_OpponentDeckIDs
-; output:
-;	carry = set:  if the opponent in a is already among the first c opponents in sChallengeMachineOpponents
+; return carry if the opponent in a is already among
+; the first c opponents in sChallengeMachineOpponents
 ChallengeMachine_CheckIfOpponentAlreadySelected:
 	ld hl, sChallengeMachineOpponents
 .loop
@@ -836,7 +760,6 @@ ChallengeMachine_CheckIfOpponentAlreadySelected:
 .found
 	scf
 	ret
-
 
 ChallengeMachine_OpponentDeckIDs:
 .club_members

@@ -1,7 +1,7 @@
 ; copy DMA to hDMAFunction
 CopyDMAFunction::
 	ld c, LOW(hDMAFunction)
-	ld b, $a ; length of DMA function (10 bytes)
+	ld b, JumpToFunctionInTable - DMA
 	ld hl, DMA
 .loop
 	ld a, [hli]

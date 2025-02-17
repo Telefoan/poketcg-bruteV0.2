@@ -1,10 +1,13 @@
 AIActionTable_LegendaryDragonite:
-	dw AIDoTurn_LegendaryDragonite    ; .do_turn (unused)
-	dw AIDoTurn_LegendaryDragonite    ; .do_turn
+	dw .do_turn ; unused
+	dw .do_turn
 	dw .start_duel
-	dw AIDecideBenchPokemonToSwitchTo ; .forced_switch
-	dw AIDecideBenchPokemonToSwitchTo ; .ko_switch
-	dw AIPickPrizeCards               ; .take_prize
+	dw .forced_switch
+	dw .ko_switch
+	dw .take_prize
+
+.do_turn
+	jp AIDoTurn_LegendaryDragonite
 
 .start_duel
 	call InitAIDuelVars
@@ -14,26 +17,35 @@ AIActionTable_LegendaryDragonite:
 	ret nc
 	jp AIPlayInitialBasicCards
 
+.forced_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.ko_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.take_prize
+	jp AIPickPrizeCards
+
 .list_arena
-	db KANGASKHAN
-	db LAPRAS
-	db CHARMANDER
-	db DRATINI
-	db MAGIKARP
-	db $00
+	dw KANGASKHAN
+	dw LAPRAS
+	dw CHARMANDER
+	dw DRATINI
+	dw MAGIKARP
+	dw NULL
 
 .list_bench
-	db CHARMANDER
-	db MAGIKARP
-	db DRATINI
-	db LAPRAS
-	db KANGASKHAN
-	db $00
+	dw CHARMANDER
+	dw MAGIKARP
+	dw DRATINI
+	dw LAPRAS
+	dw KANGASKHAN
+	dw NULL
 
 .list_retreat
 	ai_retreat CHARMANDER, -1
 	ai_retreat MAGIKARP,   -5
-	db $00
+	dw NULL
 
 .list_energy
 	ai_energy CHARMANDER,     3, +1
@@ -46,31 +58,30 @@ AIActionTable_LegendaryDragonite:
 	ai_energy DRAGONITE_LV41, 3, -1
 	ai_energy KANGASKHAN,     2, -2
 	ai_energy LAPRAS,         3, +0
-	db $00
+	dw NULL
 
 .list_prize
-	db GAMBLER
-	db DRAGONITE_LV41
-	db KANGASKHAN
-	db $00
+	dw GAMBLER
+	dw DRAGONITE_LV41
+	dw KANGASKHAN
+	dw NULL
 
 .store_list_pointers
 	store_list_pointer wAICardListAvoidPrize, .list_prize
 	store_list_pointer wAICardListArenaPriority, .list_arena
 	store_list_pointer wAICardListBenchPriority, .list_bench
 	store_list_pointer wAICardListPlayFromHandPriority, .list_bench
-	store_list_pointer wAICardListRetreatBonus, .list_retreat
+	; missing store_list_pointer wAICardListRetreatBonus, .list_retreat
 	store_list_pointer wAICardListEnergyBonus, .list_energy
 	ret
-
 
 AIDoTurn_LegendaryDragonite:
 ; initialize variables
 	call InitAITurnVars
 	ld a, AI_TRAINER_CARD_PHASE_01
 	call AIProcessHandTrainerCards
-	call HandleAIAntiMewtwoDeckStrategy
-	jr nc, .try_attack
+	farcall HandleAIAntiMewtwoDeckStrategy
+	jp nc, .try_attack
 ; process Trainer cards
 	ld a, AI_TRAINER_CARD_PHASE_02
 	call AIProcessHandTrainerCards
@@ -89,19 +100,18 @@ AIDoTurn_LegendaryDragonite:
 	or a
 	jr nz, .skip_energy_attach_1
 
-; if the Active Pokémon is a Kangaskhan
-; and it doesn't have any attached Energy,
-; try attaching an Energy card to it from the hand.
-; otherwise, run the normal AI energy attach routine.
+; if Arena card is Kangaskhan and doesn't
+; have Energy cards attached, try attaching from hand.
+; otherwise run normal AI energy attach routine.
 	ld a, DUELVARS_ARENA_CARD
-	get_turn_duelist_var
-	call _GetCardIDFromDeckIndex
-	cp KANGASKHAN
+	call GetTurnDuelistVariable
+	call GetCardIDFromDeckIndex
+	cp16 KANGASKHAN
 	jr nz, .attach_normally
 	call CreateEnergyCardListFromHand
 	jr c, .skip_energy_attach_1
 	ld e, PLAY_AREA_ARENA
-	call GetPlayAreaCardAttachedEnergies
+	call CountNumberOfEnergyCardsAttached
 	or a
 	jr nz, .attach_normally
 	xor a ; PLAY_AREA_ARENA
@@ -114,7 +124,6 @@ AIDoTurn_LegendaryDragonite:
 .skip_energy_attach_1
 ; play Pokemon from hand again
 	call AIDecidePlayPokemonCard
-	ret c ; return if turn ended
 	ld a, AI_TRAINER_CARD_PHASE_15
 	call AIProcessHandTrainerCards
 ; if used Professor Oak, process new hand
@@ -138,8 +147,8 @@ AIDoTurn_LegendaryDragonite:
 	ld a, [wAlreadyPlayedEnergy]
 	or a
 	call z, AIProcessAndTryToPlayEnergy
+.skip_energy_attach_2
 	call AIDecidePlayPokemonCard
-	ret c ; return if turn ended
 .try_attack
 ; attack if possible, if not,
 ; finish turn without attacking.

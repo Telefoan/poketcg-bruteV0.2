@@ -1,9 +1,8 @@
-; handles player input in the check menu
+; handle player input in check menu
 ; works out which cursor coordinate to go to
-; output:
-;	a =  1:      if the A button was pressed
-;	a = -1:      if the B button was pressed
-;	carry = set:  if either the A or the B button were pressed
+; and sets carry flag if A or B are pressed
+; returns a =  $1 if A pressed
+; returns a = $ff if B pressed
 HandleCheckMenuInput:
 	xor a
 	ld [wMenuInputSFX], a
@@ -11,7 +10,9 @@ HandleCheckMenuInput:
 	ld d, a
 	ld a, [wCheckMenuCursorYPosition]
 	ld e, a
-	; d,e = x,y positions of the cursor sprite
+
+; d = cursor x position
+; e = cursor y position
 
 	ldh a, [hDPadHeld]
 	or a
@@ -21,7 +22,7 @@ HandleCheckMenuInput:
 	bit D_RIGHT_F, a
 	jr z, .check_vertical
 
-; handles horizontal input
+; handle horizontal input
 .horizontal
 	ld a, d
 	xor $1 ; flips x coordinate
@@ -33,7 +34,7 @@ HandleCheckMenuInput:
 	bit D_DOWN_F, a
 	jr z, .no_pad
 
-; handles vertical input
+; handle vertical input
 .vertical
 	ld a, e
 	xor $01 ; flips y coordinate
@@ -42,15 +43,17 @@ HandleCheckMenuInput:
 .okay
 	ld a, SFX_CURSOR
 	ld [wMenuInputSFX], a
+	push de
 	call EraseCheckMenuCursor
+	pop de
 
-; updates x and y cursor positions
+; update x and y cursor positions
 	ld a, d
 	ld [wCheckMenuCursorXPosition], a
 	ld a, e
 	ld [wCheckMenuCursorYPosition], a
 
-; resets cursor blink
+; reset cursor blink
 	xor a
 	ld [wCheckMenuCursorBlinkCounter], a
 .no_pad
@@ -59,15 +62,15 @@ HandleCheckMenuInput:
 	jr z, .no_input
 	and A_BUTTON
 	jr nz, .a_press
-	ld a, -1 ; cancel
-	call PlaySFXConfirmOrCancel_Bank2
+	ld a, $ff ; cancel
+	call PlaySFXConfirmOrCancel
 	scf
 	ret
 
 .a_press
 	call DisplayCheckMenuCursor
-	ld a, $1
-	call PlaySFXConfirmOrCancel_Bank2
+	ld a, $01
+	call PlaySFXConfirmOrCancel
 	scf
 	ret
 
@@ -75,6 +78,7 @@ HandleCheckMenuInput:
 	ld a, [wMenuInputSFX]
 	or a
 	call nz, PlaySFX
+.check_blink
 	ld hl, wCheckMenuCursorBlinkCounter
 	ld a, [hl]
 	inc [hl]
@@ -84,57 +88,53 @@ HandleCheckMenuInput:
 	ld a, SYM_CURSOR_R ; cursor byte
 	bit 4, [hl] ; only draw cursor if blink counter's fourth bit is not set
 	jr z, DrawCheckMenuCursor
-;	fallthrough
 
-; draws a blank tile over the menu cursor.
-; preserves de
+; draws in the cursor position
 EraseCheckMenuCursor:
-	xor a ; SYM_SPACE (blank tile)
-;	fallthrough
+	ld a, SYM_SPACE ; empty cursor
+; fallthrough
 
-; transforms the cursor position into coordinates
-; in order to draw the tile in a over the menu cursor.
-; preserves de
+; draws in the cursor position
 ; input:
-;	a = tile byte to draw (SYM_* constant)
+; a = tile byte to draw
 DrawCheckMenuCursor:
-	push af
+	ld e, a
+	ld a, 10
+	ld l, a
 	ld a, [wCheckMenuCursorXPosition]
 	ld h, a
-	ld l, 10
 	call HtimesL
-	ld b, l
-	inc b
-	; b = 10 * cursor x position + 1
+
+	ld a, l
+	add 1
+	ld b, a
 	ld a, [wCheckMenuCursorYPosition]
-	add a
+	sla a
 	add 14
 	ld c, a
-	; c = 2 * cursor y position + 14
-	pop af
+
+	ld a, e
 	call WriteByteToBGMap0
 	or a
 	ret
 
-; draws a right-facing arrow icon where the cursor should go.
-; preserves de
 DisplayCheckMenuCursor:
 	ld a, SYM_CURSOR_R
 	jr DrawCheckMenuCursor
 
-
-; plays a sound effect depending on the value in a
-; preserves all registers
+; plays sound depending on value in a
 ; input:
-;	a  = -1:  play SFX_CANCEL  (usually following a B press)
-;	a != -1:  play SFX_CONFIRM (usually following an A press)
-PlaySFXConfirmOrCancel_Bank2:
+; a  = $ff: play cancel sound
+; a != $ff: play confirm sound
+PlaySFXConfirmOrCancel:
 	push af
-	inc a ; cp -1
+	inc a
+	jr z, .asm_9103
 	ld a, SFX_CONFIRM
-	jr nz, .play_sfx
+	jr .asm_9105
+.asm_9103
 	ld a, SFX_CANCEL
-.play_sfx
+.asm_9105
 	call PlaySFX
 	pop af
 	ret

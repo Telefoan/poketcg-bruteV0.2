@@ -1,6 +1,4 @@
-; input:
-;	a = index of the entry in the table to jump to
-;	hl = pointer table to use
+; jumps to index a in pointer table hl
 JumpToFunctionInTable::
 	add a
 	add l
@@ -13,21 +11,20 @@ JumpToFunctionInTable::
 	ld l, a
 	jp hl
 
-
-; calls the function at [hl], if non-NULL
+; call function at [hl] if non-NULL
 CallIndirect::
 	push af
 	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	or h
+	or [hl]
 	jr nz, .call_hl
 	pop af
 	ret
 .call_hl
+	ld a, [hld]
+	ld l, [hl]
+	ld h, a
 	pop af
 ;	fallthrough
 
-; jumps to the address pointed to by the hl register
 CallHL::
 	jp hl

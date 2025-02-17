@@ -9,14 +9,14 @@ FireClubLobbyAfterDuel:
 	dw Script_LostToJessicaInFireClubLobby
 	db $00
 
+FireClubPressedA:
+	ld hl, SlowpokePaintingObjectTable
+	jp FindExtraInteractableObjects
+
 SlowpokePaintingObjectTable:
 	db 16, 2, NORTH
 	dw Script_ee76
 	db $00
-
-FireClubPressedA:
-	ld hl, SlowpokePaintingObjectTable
-;	fallthrough
 
 ; Given a table with data of the form:
 ;	X, Y, Dir, Script
@@ -66,7 +66,7 @@ Script_Jessica:
 	test_if_event_equal EVENT_PUPIL_JESSICA_STATE, PUPIL_ACTIVE
 	print_variable_npc_text Text068d, Text068e
 	set_event EVENT_PUPIL_JESSICA_STATE, PUPIL_TALKED
-	ask_question_jump JessicaWouldYouLikeToDuelText, .ows_edb2
+	ask_question_jump Text068f, .ows_edb2
 	print_npc_text Text0690
 	quit_script_fully
 

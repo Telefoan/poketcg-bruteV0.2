@@ -1,4 +1,4 @@
-rom := poketcg_v2.gbc
+rom := poketcg_ext.gbc
 
 rom_obj := \
 	src/main.o \
@@ -86,7 +86,7 @@ endif
 %.asm: ;
 
 
-opts = -cjsv -k 01 -l 0x33 -m 0x1b -p 0xff -r 03 -t POKECARD -i AXQE
+opts = -Cjv -k 01 -l 0x33 -m 0x1b -p 0xff -r 03 -t POKECARD -i AXQE
 
 $(rom): $(rom_obj) src/layout.link
 	$(RGBLINK) -p 0xff -m $(rom:.gbc=.map) -n $(rom:.gbc=.sym) -l src/layout.link -o $@ $(filter %.o,$^)
@@ -95,22 +95,17 @@ $(rom): $(rom_obj) src/layout.link
 
 ### Misc file-specific graphics rules
 
-src/gfx/booster_packs/colosseum2.2bpp: rgbgfx += -x 10
-src/gfx/booster_packs/evolution2.2bpp: rgbgfx += -x 10
-src/gfx/booster_packs/laboratory2.2bpp: rgbgfx += -x 10
-src/gfx/booster_packs/mystery2.2bpp: rgbgfx += -x 10
+src/gfx/booster_packs/colosseum.2bpp: rgbgfx += -x 10
+src/gfx/booster_packs/evolution.2bpp: rgbgfx += -x 10
+src/gfx/booster_packs/laboratory.2bpp: rgbgfx += -x 10
+src/gfx/booster_packs/mystery.2bpp: rgbgfx += -x 10
 
 src/gfx/cards/%.2bpp: rgbgfx += -Z -P
 
 src/gfx/duel/anims/result.2bpp: rgbgfx += -x 10
-src/gfx/duel/dmg_sgb_symbols.2bpp: rgbgfx += -x 7
 src/gfx/duel/other.2bpp: rgbgfx += -x 7
 
 src/gfx/fonts/full_width/4.1bpp: rgbgfx += -x 3
-
-src/gfx/link/card_pop_scene.2bpp: rgbgfx += -x 3
-src/gfx/link/link_scene.2bpp: rgbgfx += -x 3
-src/gfx/link/printer_scene.2bpp: rgbgfx += -x 3
 
 src/gfx/overworld_map.2bpp: rgbgfx += -x 15
 
@@ -131,12 +126,7 @@ src/gfx/tilesets/rockclub.2bpp: rgbgfx += -x 4
 src/gfx/tilesets/scienceclub.2bpp: rgbgfx += -x 14
 src/gfx/tilesets/waterclub.2bpp: rgbgfx += -x 15
 
-src/gfx/titlescreen/japanese_title_screen.2bpp: rgbgfx += -x 15
-src/gfx/titlescreen/japanese_title_screen_cgb.2bpp: rgbgfx += -x 15
-src/gfx/titlescreen/japanese_title_screen_2.2bpp: rgbgfx += -x 12
-src/gfx/titlescreen/japanese_title_screen_2_cgb.2bpp: rgbgfx += -x 5
-src/gfx/titlescreen/title_screen.2bpp: rgbgfx += -x 4
-src/gfx/titlescreen/title_screen_cgb.2bpp: rgbgfx += -x 12
+src/gfx/titlescreen/title_screen.2bpp: rgbgfx += -x 12
 
 
 ### Catch-all graphics rules

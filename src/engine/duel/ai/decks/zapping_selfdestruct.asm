@@ -1,10 +1,13 @@
 AIActionTable_ZappingSelfdestruct:
-	dw AIMainTurnLogic                ; .do_turn (unused)
-	dw AIMainTurnLogic                ; .do_turn
+	dw .do_turn ; unused
+	dw .do_turn
 	dw .start_duel
-	dw AIDecideBenchPokemonToSwitchTo ; .forced_switch
-	dw AIDecideBenchPokemonToSwitchTo ; .ko_switch
-	dw AIPickPrizeCards               ; .take_prize
+	dw .forced_switch
+	dw .ko_switch
+	dw .take_prize
+
+.do_turn
+	jp AIMainTurnLogic
 
 .start_duel
 	call InitAIDuelVars
@@ -14,25 +17,34 @@ AIActionTable_ZappingSelfdestruct:
 	ret nc
 	jp AIPlayInitialBasicCards
 
+.forced_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.ko_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.take_prize
+	jp AIPickPrizeCards
+
 .list_arena
-	db KANGASKHAN
-	db ELECTABUZZ_LV35
-	db TAUROS
-	db MAGNEMITE_LV13
-	db VOLTORB
-	db $00
+	dw KANGASKHAN
+	dw ELECTABUZZ_LV35
+	dw TAUROS
+	dw MAGNEMITE_LV13
+	dw VOLTORB
+	dw NULL
 
 .list_bench
-	db MAGNEMITE_LV13
-	db VOLTORB
-	db ELECTABUZZ_LV35
-	db TAUROS
-	db KANGASKHAN
-	db $00
+	dw MAGNEMITE_LV13
+	dw VOLTORB
+	dw ELECTABUZZ_LV35
+	dw TAUROS
+	dw KANGASKHAN
+	dw NULL
 
 .list_retreat
 	ai_retreat VOLTORB, -1
-	db $00
+	dw NULL
 
 .list_energy
 	ai_energy MAGNEMITE_LV13,  3, +1
@@ -42,17 +54,17 @@ AIActionTable_ZappingSelfdestruct:
 	ai_energy ELECTABUZZ_LV35, 1, +0
 	ai_energy KANGASKHAN,      2, -2
 	ai_energy TAUROS,          3, +0
-	db $00
+	dw NULL
 
 .list_prize
-	db KANGASKHAN
-	db $00
+	dw KANGASKHAN
+	dw NULL
 
 .store_list_pointers
 	store_list_pointer wAICardListAvoidPrize, .list_prize
 	store_list_pointer wAICardListArenaPriority, .list_arena
 	store_list_pointer wAICardListBenchPriority, .list_bench
 	store_list_pointer wAICardListPlayFromHandPriority, .list_bench
-	store_list_pointer wAICardListRetreatBonus, .list_retreat
+	; missing store_list_pointer wAICardListRetreatBonus, .list_retreat
 	store_list_pointer wAICardListEnergyBonus, .list_energy
 	ret

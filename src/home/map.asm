@@ -1,4 +1,4 @@
-; preserves de and hl
+
 OverworldDoFrameFunction::
 	ld a, [wOverworldNPCFlags]
 	bit HIDE_ALL_NPC_SPRITES, a
@@ -6,23 +6,22 @@ OverworldDoFrameFunction::
 	ldh a, [hBankROM]
 	push af
 	ld a, BANK(SetScreenScrollWram)
-	rst BankswitchROM
+	call BankswitchROM
 	call SetScreenScrollWram
-	call Func_c554 ; this function is also in Bank $03
+	call Func_c554
 	ld a, BANK(HandleAllNPCMovement)
-	rst BankswitchROM
+	call BankswitchROM
 	call HandleAllNPCMovement
 	call HandleAllSpriteAnimations
 	ld a, BANK(DoLoadedFramesetSubgroupsFrame)
-	rst BankswitchROM
+	call BankswitchROM
 	call DoLoadedFramesetSubgroupsFrame
 	call UpdateRNGSources
 	pop af
 	jp BankswitchROM
 
-
-; enables the play time counter and executes the game event at [wGameEvent].
-; then returns to the overworld, or restarts the game (only after Credits).
+; enable the play time counter and execute the game event at [wGameEvent].
+; then return to the overworld, or restart the game (only after Credits).
 ExecuteGameEvent::
 	ld a, 1
 	ld [wPlayTimeCounterEnable], a
@@ -37,7 +36,7 @@ ExecuteGameEvent::
 	pop af
 	jp BankswitchROM
 
-; executes a game event at [wGameEvent] from GameEventPointerTable
+; execute a game event at [wGameEvent] from GameEventPointerTable
 _ExecuteGameEvent::
 	ld a, [wGameEvent]
 	cp NUM_GAME_EVENTS
@@ -50,94 +49,28 @@ _ExecuteGameEvent::
 GameEventPointerTable::
 	dw GameEvent_Overworld
 	dw GameEvent_Duel
-	dw GameEvent_BattleCenter
-	dw GameEvent_GiftCenter
 	dw GameEvent_Credits
 	dw GameEvent_ContinueDuel
 	dw GameEvent_ChallengeMachine
 	dw GameEvent_Overworld
 
+GameEvent_Overworld::
+	scf
+	ret
 
-; output:
-;	carry = set
 GameEvent_Duel::
 	ld a, GAME_EVENT_DUEL
 	ld [wActiveGameEvent], a
 	xor a
 	ld [wSongOverride], a
 	call EnableSRAM
+	xor a
 	ld [sPlayerInChallengeMachine], a
 	call DisableSRAM
 	call SaveGeneralSaveData
 	bank1call StartDuel_VSAIOpp
 	scf
 	ret
-
-
-; output:
-;	carry = set
-GameEvent_BattleCenter::
-	ld a, GAME_EVENT_BATTLE_CENTER
-	ld [wActiveGameEvent], a
-	xor a
-	ld [wSongOverride], a
-	dec a ; -1
-	ld [wDuelResult], a
-	ld a, MUSIC_DUEL_THEME_1
-	ld [wDuelTheme], a
-	ld a, MUSIC_CARD_POP
-	call PlaySong
-	farcall SetUpAndStartLinkDuel
-	scf
-	ret
-
-
-; output:
-;	carry = set
-GameEvent_GiftCenter::
-	ldh a, [hBankROM]
-	push af
-	call PauseSong
-	ld a, MUSIC_CARD_POP
-	call PlaySong
-	ld a, BANK(HandleGiftCenter)
-	rst BankswitchROM
-	ld a, GAME_EVENT_GIFT_CENTER
-	ld [wActiveGameEvent], a
-	ld a, [wGiftCenterChoice]
-	or $10
-	ld [wGiftCenterChoice], a
-	call HandleGiftCenter
-	ld a, [wGiftCenterChoice]
-	and $ef
-	ld [wGiftCenterChoice], a
-	call ResumeSong
-	pop af
-	rst BankswitchROM
-	scf
-	ret
-
-
-GameEvent_Credits::
-	farcall PlayCreditsSequence
-	or a
-	ret
-
-
-; output:
-;	carry = set
-GameEvent_ContinueDuel::
-	xor a
-	ld [wSongOverride], a
-	bank1call TryContinueDuel
-	call EnableSRAM
-	ld a, [sPlayerInChallengeMachine]
-	call DisableSRAM
-	cp $ff
-	jr z, GameEvent_ChallengeMachine.asm_38ed
-	scf
-	ret
-
 
 GameEvent_ChallengeMachine::
 	ld a, MUSIC_PC_MAIN_MENU
@@ -152,16 +85,26 @@ GameEvent_ChallengeMachine::
 	ld a, MUSIC_OVERWORLD
 	ld [wDefaultSong], a
 	call PlayDefaultSong
-;	fallthrough
-
-; output:
-;	carry = set
-GameEvent_Overworld::
 	scf
 	ret
 
+GameEvent_ContinueDuel::
+	xor a
+	ld [wSongOverride], a
+	bank1call TryContinueDuel
+	call EnableSRAM
+	ld a, [sPlayerInChallengeMachine]
+	call DisableSRAM
+	cp $ff
+	jr z, GameEvent_ChallengeMachine.asm_38ed
+	scf
+	ret
 
-; preserves all registers except af
+GameEvent_Credits::
+	farcall PlayCreditsSequence
+	or a
+	ret
+
 GetReceivedLegendaryCards::
 	ld a, EVENT_RECEIVED_LEGENDARY_CARDS
 	farcall GetEventValue
@@ -169,12 +112,7 @@ GetReceivedLegendaryCards::
 	ld [sReceivedLegendaryCards], a
 	jp DisableSRAM
 
-
-; preserves all registers except af
-; input:
-;	bc = x and y coordinates for the current map
-; output:
-;	a = permission byte corresponding to the coordinates from input
+; return in a the permission byte corresponding to the current map's x,y coordinates at bc
 GetPermissionOfMapPosition::
 	push hl
 	call GetPermissionByteOfMapPosition
@@ -182,12 +120,7 @@ GetPermissionOfMapPosition::
 	pop hl
 	ret
 
-
 ; set to a the permission byte corresponding to the current map's x,y coordinates at bc
-; preserves all registers
-; input:
-;	a = new permission byte value
-;	bc = x and y coordinates for the current map
 SetPermissionOfMapPosition::
 	push hl
 	push af
@@ -197,15 +130,11 @@ SetPermissionOfMapPosition::
 	pop hl
 	ret
 
-
 ; set the permission byte corresponding to the current map's x,y coordinates at bc
 ; to the value of register a anded by its current value
-; preserves all registers except af
-; input:
-;	a = value used to modify the permission byte
-;	bc = x and y coordinates for the current map
 UpdatePermissionOfMapPosition::
 	push hl
+	push bc
 	push de
 	cpl
 	ld e, a
@@ -214,15 +143,12 @@ UpdatePermissionOfMapPosition::
 	and e
 	ld [hl], a
 	pop de
+	pop bc
 	pop hl
 	ret
 
-
-; preserves bc and de
-; input:
-;	bc = x and y coordinates for the current map
-; output:
-;	hl = address within wPermissionMap corresponding to the coordinates from input
+; returns in hl the address within wPermissionMap that corresponds to
+; the current map's x,y coordinates at bc
 GetPermissionByteOfMapPosition::
 	push bc
 	srl b
@@ -238,22 +164,15 @@ GetPermissionByteOfMapPosition::
 	pop bc
 	ret
 
-
 ; copy c bytes of data from hl in bank wTempPointerBank to de, b times.
-; input:
-;	b = number of times to copy
-;	c = number of bytes to copy
-;	hl = address from which to start copying the data
-;	de = where to copy the data
 CopyGfxDataFromTempBank::
 	ldh a, [hBankROM]
 	push af
 	ld a, [wTempPointerBank]
-	rst BankswitchROM
+	call BankswitchROM
 	call CopyGfxData
 	pop af
 	jp BankswitchROM
-
 
 ; Movement offsets for player movements
 PlayerMovementOffsetTable::
@@ -262,14 +181,12 @@ PlayerMovementOffsetTable::
 	db  0,  1 ; SOUTH
 	db -1,  0 ; WEST
 
-
 ; Movement offsets for player movements, in tiles
 PlayerMovementOffsetTable_Tiles::
 	db  0, -2 ; NORTH
 	db  2,  0 ; EAST
 	db  0,  2 ; SOUTH
 	db -2,  0 ; WEST
-
 
 OverworldMapNames::
 	table_width 2, OverworldMapNames
@@ -289,37 +206,26 @@ OverworldMapNames::
 	tx OverworldMapMysteryHouseText
 	assert_table_length NUM_OWMAP_NAMES
 
-
-; preserves all registers except af
 HandleMapWarp::
 	ldh a, [hBankROM]
 	push af
 	ld a, BANK(_HandleMapWarp)
-	rst BankswitchROM
+	call BankswitchROM
 	call _HandleMapWarp
 	pop af
 	jp BankswitchROM
 
-
-; preserves bc and de
-; input:
-;	a = NPC's index (0-7) for wLoadedNPCs table
-; output:
-;	hl = pointer to the location of NPC's ID in wLoadedNPCs
+; returns in hl a pointer to the first element for the a'th NPC
 GetLoadedNPCID::
 	ld l, LOADED_NPC_ID
-;	fallthrough
+	jp GetItemInLoadedNPCIndex
 
-; preserves bc and de
-; input:
-;	a = NPC's index (0-7) for wLoadedNPCs table
-;	l = NPC parameter to find (LOADED_NPC_* constant)
-; output:
-;	hl = pointer to the location of NPC's parameter l in wLoadedNPCs
+; return in hl a pointer to the a'th items element l
 GetItemInLoadedNPCIndex::
 	push bc
 	cp LOADED_NPC_MAX
 	jr c, .asm_39b4
+	debug_nop
 	xor a
 .asm_39b4
 	add a
@@ -335,14 +241,9 @@ GetItemInLoadedNPCIndex::
 	pop bc
 	ret
 
-
-; Finds the index on the wLoadedNPCs table of the NPC in wTempNPC
-; preserves all registers except af
-; input:
-;	[wTempNPC] = NPC to find
-; output:
-;	carry = set:  if the NPC wasn't found
-;	[wLoadedNPCTempIndex] & a = NPC's index (0-7) for wLoadedNPCs table
+; Finds the index on wLoadedNPCs table of the npc in wTempNPC
+; returns it in a and puts it into wLoadedNPCTempIndex
+; c flag set if no npc found
 FindLoadedNPC::
 	push hl
 	push bc
@@ -373,22 +274,61 @@ FindLoadedNPC::
 	pop hl
 	ret
 
-
-; preserves all registers except af
-;input:
-;	bc = address of next NPC movement byte
-; output:
-;	a = next NPC movement byte
 GetNextNPCMovementByte::
 	push bc
 	ldh a, [hBankROM]
 	push af
 	ld a, BANK(ExecuteNPCMovement)
-	rst BankswitchROM
+	call BankswitchROM
 	ld a, [bc]
 	ld c, a
 	pop af
-	rst BankswitchROM
+	call BankswitchROM
 	ld a, c
 	pop bc
+	ret
+
+PlayDefaultSong::
+	push hl
+	push bc
+	call AssertSongFinished
+	or a
+	push af
+	call GetDefaultSong
+	ld c, a
+	pop af
+	jr z, .asm_3a11
+	ld a, c
+	ld hl, wSongOverride
+	cp [hl]
+	jr z, .asm_3a1c
+.asm_3a11
+	ld a, c
+	cp NUM_SONGS
+	jr nc, .asm_3a1c
+	ld [wSongOverride], a
+	call PlaySong
+.asm_3a1c
+	pop bc
+	pop hl
+	ret
+
+; returns [wDefaultSong] or MUSIC_RONALD in a
+GetDefaultSong::
+	ld a, [wRonaldIsInMap]
+	or a
+	jr z, .default_song
+	; only return Ronald's theme if it's
+	; not in one of the following maps
+	ld a, [wOverworldMapSelection]
+	cp OWMAP_ISHIHARAS_HOUSE
+	jr z, .default_song
+	cp OWMAP_CHALLENGE_HALL
+	jr z, .default_song
+	cp OWMAP_POKEMON_DOME
+	jr z, .default_song
+	ld a, MUSIC_RONALD
+	ret
+.default_song
+	ld a, [wDefaultSong]
 	ret

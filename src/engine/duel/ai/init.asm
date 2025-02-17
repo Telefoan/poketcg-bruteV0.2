@@ -1,4 +1,3 @@
-; preserves bc and de
 InitAIDuelVars:
 	ld a, wAIDuelVarsEnd - wAIDuelVars
 	ld hl, wAIDuelVars
@@ -9,11 +8,9 @@ InitAIDuelVars:
 	ld [wAIPeekedPrizes], a
 	ret
 
-
 ; initializes some variables and sets value of wAIBarrierFlagCounter.
 ; if Player uses Barrier 3 times in a row, AI checks if Player's deck
-; has only MewtwoLv53 Pokémon cards (running a MewtwoLv53 mill deck).
-; preserves bc
+; has only MewtwoLv53 Pokemon cards (running a MewtwoLv53 mill deck).
 InitAITurnVars:
 ; increase Pokedex counter by 1
 	ld a, [wAIPokedexCounter]
@@ -39,10 +36,10 @@ InitAITurnVars:
 
 ; if the card is MewtwoLv53, it means the Player
 ; used its second attack, Barrier.
-	rst SwapTurn
-	call _GetCardIDFromDeckIndex
-	rst SwapTurn
-	cp MEWTWO_LV53
+	call SwapTurn
+	call GetCardIDFromDeckIndex
+	call SwapTurn
+	cp16 MEWTWO_LV53
 	jr nz, .check_flag
 	; Player used Barrier last turn
 
@@ -56,36 +53,44 @@ InitAITurnVars:
 	inc a
 	ld [wAIBarrierFlagCounter], a
 	cp 3
-	ret c
+	jr c, .done
 
-; this means that the Player used Barrier at least 3 turns in a row.
-; check if the opponent is using a deck with no Pokémon other than MewtwoLv53,
-; and if so, set the wAIBarrierFlagCounter flag.
-	rst SwapTurn
+; this means that the Player used Barrier
+; at least 3 turns in a row.
+; check if Player is running MewtwoLv53-only deck,
+; if so, set wAIBarrierFlagCounter flag.
 	ld a, DUELVARS_ARENA_CARD
-	get_turn_duelist_var
-	call _GetCardIDFromDeckIndex
-	rst SwapTurn
-	cp MEWTWO_LV53
-	jr nz, .reset
+	call GetNonTurnDuelistVariable
+	call SwapTurn
+	call GetCardIDFromDeckIndex
+	call SwapTurn
+	cp16 MEWTWO_LV53
+	jr nz, .reset_1
 	farcall CheckIfPlayerHasPokemonOtherThanMewtwoLv53
 	jr nc, .set_flag
-.reset
+.reset_1
 ; reset wAIBarrierFlagCounter
 	xor a
 	ld [wAIBarrierFlagCounter], a
-	ret
+	jr .done
 
 .set_flag
 	ld a, AI_MEWTWO_MILL
 	ld [wAIBarrierFlagCounter], a
-	ret
+	jr .done
 
 .check_flag
 ; increase counter by 1 if flag is set
 	ld a, [wAIBarrierFlagCounter]
 	bit AI_MEWTWO_MILL_F, a
-	jr z, .reset
+	jr z, .reset_2
 	inc a
 	ld [wAIBarrierFlagCounter], a
+	jr .done
+
+.reset_2
+; reset wAIBarrierFlagCounter
+	xor a
+	ld [wAIBarrierFlagCounter], a
+.done
 	ret

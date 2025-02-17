@@ -9,10 +9,11 @@ GiveBoosterPack:
 	ld [wTextBoxFrameType], a
 	pop bc
 	push bc
-	ld b, $00
+	ld b, 0
 	ld hl, BoosterTypes
 	add hl, bc
 	ld a, [hl]
+	ld c, a
 	add a
 	add a
 	ld c, a
@@ -51,7 +52,9 @@ GiveBoosterPack:
 	call PrintScrollableText_NoTextBoxLabel
 	call DisableLCD
 	call SetDefaultPalettes
-	call ZeroObjectPositionsAndToggleOAMCopy
+	call ZeroObjectPositions
+	ld a, $1
+	ld [wVBlankOAMCopyToggle], a
 	ld a, $4
 	ld [wTextBoxFrameType], a
 	farcall OpenBoosterPack
@@ -96,13 +99,16 @@ BoosterTypes:
 
 BoosterScenesAndNameTexts:
 	db SCENE_COLOSSEUM_BOOSTER, SCENE_COLOSSEUM_BOOSTER
-	tx ColosseumName
+	tx ColosseumBoosterText
 
 	db SCENE_EVOLUTION_BOOSTER, SCENE_EVOLUTION_BOOSTER
-	tx EvolutionName
+	tx EvolutionBoosterText
 
 	db SCENE_MYSTERY_BOOSTER, SCENE_MYSTERY_BOOSTER
-	tx MysteryName
+	tx MysteryBoosterText
 
 	db SCENE_LABORATORY_BOOSTER, SCENE_LABORATORY_BOOSTER
-	tx LaboratoryName
+	tx LaboratoryBoosterText
+
+_PauseMenu_Exit:
+	ret

@@ -31,7 +31,7 @@ Bank1Call::
 ;	fallthrough
 
 Bank1Call_FarCall_Common::
-	rst BankswitchROM
+	call BankswitchROM
 	ld hl, sp+$d
 	inc de
 	inc de
@@ -49,7 +49,7 @@ SwitchToBankAtSP::
 	push hl
 	ld hl, sp+$04
 	ld a, [hl]
-	rst BankswitchROM
+	call BankswitchROM
 	pop hl
 	pop af
 	inc sp

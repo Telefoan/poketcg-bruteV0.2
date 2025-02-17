@@ -1,10 +1,13 @@
 AIActionTable_FirstStrike:
-	dw AIMainTurnLogic                ; .do_turn (unused)
-	dw AIMainTurnLogic                ; .do_turn
+	dw .do_turn ; unused
+	dw .do_turn
 	dw .start_duel
-	dw AIDecideBenchPokemonToSwitchTo ; .forced_switch
-	dw AIDecideBenchPokemonToSwitchTo ; .ko_switch
-	dw AIPickPrizeCards               ; .take_prize
+	dw .forced_switch
+	dw .ko_switch
+	dw .take_prize
+
+.do_turn
+	jp AIMainTurnLogic
 
 .start_duel
 	call InitAIDuelVars
@@ -14,25 +17,34 @@ AIActionTable_FirstStrike:
 	ret nc
 	jp AIPlayInitialBasicCards
 
+.forced_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.ko_switch
+	jp AIDecideBenchPokemonToSwitchTo
+
+.take_prize
+	jp AIPickPrizeCards
+
 .list_arena
-	db HITMONCHAN
-	db MACHOP
-	db HITMONLEE
-	db MANKEY
-	db $00
+	dw HITMONCHAN
+	dw MACHOP
+	dw HITMONLEE
+	dw MANKEY
+	dw NULL
 
 .list_bench
-	db MACHOP
-	db HITMONLEE
-	db HITMONCHAN
-	db MANKEY
-	db $00
+	dw MACHOP
+	dw HITMONLEE
+	dw HITMONCHAN
+	dw MANKEY
+	dw NULL
 
 .list_retreat
 	ai_retreat MACHOP,  -1
 	ai_retreat MACHOKE, -1
 	ai_retreat MANKEY,  -2
-	db $00
+	dw NULL
 
 .list_energy
 	ai_energy MACHOP,     3, +0
@@ -42,18 +54,18 @@ AIActionTable_FirstStrike:
 	ai_energy HITMONLEE,  3, +0
 	ai_energy MANKEY,     2, -1
 	ai_energy PRIMEAPE,   3, -1
-	db $00
+	dw NULL
 
 .list_prize
-	db HITMONLEE
-	db HITMONCHAN
-	db $00
+	dw HITMONLEE
+	dw HITMONCHAN
+	dw NULL
 
 .store_list_pointers
 	store_list_pointer wAICardListAvoidPrize, .list_prize
 	store_list_pointer wAICardListArenaPriority, .list_arena
 	store_list_pointer wAICardListBenchPriority, .list_bench
 	store_list_pointer wAICardListPlayFromHandPriority, .list_bench
-	store_list_pointer wAICardListRetreatBonus, .list_retreat
+	; missing store_list_pointer wAICardListRetreatBonus, .list_retreat
 	store_list_pointer wAICardListEnergyBonus, .list_energy
 	ret

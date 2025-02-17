@@ -1,5 +1,5 @@
 NumberOfSFX:
-	db NUM_SFX
+	db $60
 
 SFXHeaderPointers:
 	table_width 2, SFXHeaderPointers
