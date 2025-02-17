@@ -89,12 +89,15 @@ FindCardsInSetAndRarity:
 	dec c
 	jr nz, .delete_type_table_loop
 	ld hl, wBoosterViableCardList
-	ld [hl], a
+	ld [hli], a
+	ld [hld], a 
 	ld de, 1 ; GRASS_ENERGY
 .check_card_viable_loop
 	push de
 	ld a, e
-	ld [wBoosterCurrentCard], a
+	ld [wBoosterCurrentCard + 0], a
+	ld a, d 
+	ld [wBoosterCurrentCard + 1], a
 	call CheckCardAlreadyDrawn
 	jr c, .finished_with_current_card
 	call CheckCardInSetAndRarity
@@ -109,17 +112,19 @@ FindCardsInSetAndRarity:
 	add hl, bc
 	inc [hl]
 	pop hl
-	ld a, [wBoosterCurrentCard]
+	ld a, [wBoosterCurrentCard + 0]
+	ld [hli], a 
+	ld a, [wBoosterCurrentCard + 1]
 	ld [hli], a
 	pop af
 	ld [hli], a
 	xor a
-	ld [hl], a
+	ld [hli], a
+	ld [hli], a 
 .finished_with_current_card
 	pop de
-	inc e
-	ld a, e
-	cp NUM_CARDS + 1
+	inc de
+	cp16 NUM_CARDS + 1
 	jr c, .check_card_viable_loop
 	ret
 
@@ -130,9 +135,9 @@ FindCardsInSetAndRarity:
 ;	[wBoosterData_Set] = BOOSTER_* constant (0-3)
 ; output:
 ;	carry = set:  if the given card doesn't belong to the current set and rarity
+; return nc if card de belongs to the current set and rarity
 CheckCardInSetAndRarity:
 	push bc
-	ld a, e
 	call GetCardTypeRarityAndSet
 	ld [wBoosterCurrentCardType], a
 	ld a, [wBoosterCurrentRarity]
@@ -288,9 +293,13 @@ DetermineBoosterCard:
 	ld hl, wBoosterViableCardList
 .find_matching_card_loop
 	ld a, [hli]
-	or a
+	or [hl]
 	jr z, .no_valid_card_found
-	ld [wBoosterCurrentCard], a
+	dec hl 
+	ld a, [hli]
+	ld [wBoosterCurrentCard + 0], a 
+	ld a, [hli]
+	ld [wBoosterCurrentCard + 1], a 
 	ld a, [wBoosterJustDrawnCardType]
 	cp [hl]
 	jr nz, .card_incorrect_type
@@ -348,28 +357,19 @@ GenerateBoosterEnergies:
 	ld hl, wBoosterData_EnergyFunctionPointer + 1
 	ld a, [hld]
 	or a
-	jr z, .no_function_pointer
+	ret z
 	ld l, [hl]
 	ld h, a
 	jp hl
-.no_function_pointer
-	ld a, [hl]
-	or a
-	ret z ; return if no hardcoded Energy either
-	push af
-	call AddBoosterEnergyToDrawnEnergies
-	pop af
-	ret
-
 
 EnergyBoosterLightningFireData:
-	db LIGHTNING_ENERGY, FIRE_ENERGY
+	dw LIGHTNING_ENERGY, FIRE_ENERGY
 
 EnergyBoosterWaterFightingData:
-	db WATER_ENERGY, FIGHTING_ENERGY
+	dw WATER_ENERGY, FIGHTING_ENERGY
 
 EnergyBoosterGrassPsychicData:
-	db GRASS_ENERGY, PSYCHIC_ENERGY
+	dw GRASS_ENERGY, PSYCHIC_ENERGY
 
 
 ; generates a booster containing 5 Lightning Energy cards and 5 Fire Energy cards
@@ -396,14 +396,19 @@ GenerateEnergyBoosterGrassPsychic:
 ; input:
 ;	hl = data listing which 2 Energy cards to use
 GenerateTwoTypesEnergyBooster:
-	ld b, $02
+	ld b, 2
 .add_two_energies_to_booster_loop
 	ld c, NUM_CARDS_IN_BOOSTER / 2
 .add_energy_to_booster_loop
-	ld a, [hl]
+	push hl
+	push bc 
+	ld a, [hli]
+	ld e, a 
+	ld d, [hl]
 	call AddBoosterEnergyToDrawnEnergies
 	dec c
 	jr nz, .add_energy_to_booster_loop
+	inc hl
 	inc hl
 	dec b
 	jr nz, .add_two_energies_to_booster_loop
@@ -432,20 +437,25 @@ GenerateRandomEnergyBooster:
 
 
 ; generates a random Energy card
-; preserves all registers except af
+; assumes grass energy is the first
 GenerateRandomEnergy:
 	ld a, NUM_COLORED_TYPES
 	call Random
-	add GRASS_ENERGY
-;	fallthrough
+	add $01
+	ld e, a 
+	ld d, HIGH(GRASS_ENERGY)
+	jr AddBoosterCardToDrawnEnergies
 
-; adds the (Energy) card at a to wBoosterTempEnergiesDrawn and wTempCardCollection
+; adds the (Energy) card at de to wBoosterTempEnergiesDrawn and wTempCardCollection
 ; preserves all registers except af
 ; input:
 ;	a = card ID to add to wBoosterTempEnergiesDrawn
 AddBoosterEnergyToDrawnEnergies:
-	ld [wBoosterCurrentCard], a
-;	fallthrough
+	ld a, e 
+	ld [wBoosterCurrentCard + 0], a 
+	ld a, d 
+	ld [wBoosterCurrentCard + 1], a 
+	jp AddBoosterCardToDrawnEnergies
 
 ; adds the (Energy) card at [wBoosterCurrentCard] to wBoosterTempEnergiesDrawn and wTempCardCollection
 ; preserves all registers except af
@@ -459,6 +469,35 @@ AddBoosterCardToDrawnEnergies:
 	pop hl
 	ret
 
+; generates a grass energy card
+GenerateGrassEnergy:
+	ld de, GRASS_ENERGY
+	jr AddBoosterEnergyToDrawnEnergies
+
+; generates a fire energy card
+GenerateFireEnergy:
+	ld de, FIRE_ENERGY
+	jr AddBoosterEnergyToDrawnEnergies
+
+; generates a water energy card
+GenerateWaterEnergy:
+	ld de, WATER_ENERGY
+	jr AddBoosterEnergyToDrawnEnergies 
+
+; generates a lightning energy card
+GenerateLightningEnergy:
+	ld de, LIGHTNING_ENERGY
+	jr AddBoosterEnergyToDrawnEnergies
+
+; generates a fighting energy card
+GenerateFightingEnergy:
+	ld de, FIGHTING_ENERGY
+	jr AddBoosterEnergyToDrawnEnergies
+
+; generates a psychic energy card
+GeneratePsychicEnergy:
+	ld de, PSYCHIC_ENERGY
+	jr AddBoosterEnergyToDrawnEnergies
 
 ; adds the (non-Energy) card at [wBoosterCurrentCard] to wBoosterTempNonEnergiesDrawn and wTempCardCollection
 ; preserves all registers except af
@@ -480,12 +519,17 @@ AddBoosterCardToDrawnNonEnergies:
 ;	[wBoosterCurrentCard] = card ID to add to the lists
 AppendCurrentCardToHL:
 	ld a, [hli]
-	or a
+	or [hl]
+	inc hl
 	jr nz, AppendCurrentCardToHL
 	dec hl
-	ld a, [wBoosterCurrentCard]
+	dec hl
+	ld a, [wBoosterCurrentCard + 0]
 	ld [hli], a
+	ld a, [wBoosterCurrentCard + 1]
+	ld [hli], a 
 	xor a
+	ld [hli], a 
 	ld [hl], a
 	ret
 
@@ -502,9 +546,13 @@ PutEnergiesAndNonEnergiesTogether:
 	ld hl, wBoosterTempEnergiesDrawn
 .loop_through_extra_cards
 	ld a, [hli]
-	or a
+	or [hl]
 	jr z, .end_of_cards
-	ld [wBoosterCurrentCard], a
+	dec hl 
+	ld a, [hli]
+	ld [wBoosterCurrentCard + 0], a
+	ld a, [hli]
+	ld [wBoosterCurrentCard + 1], a
 	push hl
 	ld hl, wBoosterTempNonEnergiesDrawn
 	call AppendCurrentCardToHL
@@ -514,6 +562,24 @@ PutEnergiesAndNonEnergiesTogether:
 	pop hl
 	ret
 
+; add the final cards drawn from the booster pack to the player's collection (sCardCollection)
+AddBoosterCardsToCollection:
+	push hl
+	ld hl, wBoosterCardsDrawn
+.add_cards_loop
+	ld a, [hli]
+	or [hl]
+	jr z, .no_cards_left
+	dec hl
+	ld a, [hli]
+	ld e, a
+	ld a, [hli]
+	ld d, a
+	call AddCardToCollection
+	jr .add_cards_loop
+.no_cards_left
+	pop hl
+	ret
 
 ; adds the card at [wBoosterCurrentCard] to wTempCardCollection
 ; preserves all registers except af
@@ -521,9 +587,13 @@ PutEnergiesAndNonEnergiesTogether:
 ;	[wBoosterCurrentCard] = card ID
 AddBoosterCardToTempCardCollection:
 	push hl
-	ld h, HIGH(wTempCardCollection)
-	ld a, [wBoosterCurrentCard]
+	ld hl, wTempCardCollection
+	ld a, [wBoosterCurrentCard + 0]
+	add l 
 	ld l, a
+	ld a, [wBoosterCurrentCard + 1]
+	adc h
+	ld h, a 
 	inc [hl]
 	pop hl
 	ret
@@ -537,9 +607,13 @@ AddBoosterCardToTempCardCollection:
 ;	carry = set:  if the given card was already added to wTempCardCollection
 CheckCardAlreadyDrawn:
 	push hl
-	ld h, HIGH(wTempCardCollection)
-	ld a, [wBoosterCurrentCard]
+	ld hl, wTempCardCollection
+	ld a, [wBoosterCurrentCard + 0]
+	add l
 	ld l, a
+	ld a, [wBoosterCurrentCard + 1]
+	adc h 
+	ld h, a 
 	ld a, [hl]
 	pop hl
 	cp $01
@@ -565,13 +639,18 @@ InitBoosterData:
 .clear_player_deck_loop
 	ld [hli], a
 	dec c
-	jr nz, .clear_player_deck_loop
-	; c = $00, so the following code will loop $100 times
+	jr nz, .clear_player_deck_loop ; c = $00, so the following code will loop $100 times
+	
 	ld hl, wTempCardCollection
-.clear_temp_card_collection_loop
+	ld bc, CARD_COLLECTION_SIZE
+.loop
+	xor a 
 	ld [hli], a
-	dec c
-	jr nz, .clear_temp_card_collection_loop
+	dec bc 
+	ld a, b 
+	or c 
+	jr nx, .loop
+	
 	call FindBoosterDataPointer
 	ld de, wBoosterData_Set
 	ld b, wBoosterData_TypeChances - wBoosterData_Set + NUM_BOOSTER_CARD_TYPES ; Pack2 - Pack1

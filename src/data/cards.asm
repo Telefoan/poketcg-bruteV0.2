@@ -1,247 +1,10 @@
-; TODO: Make card data structures more compact and rearrange the fields for
-; convenience once the meaning of all fields is figured out.
-
-CardPointers::
-	table_width 2, CardPointers
-	dw NULL
-	dw GrassEnergyCard
-	dw FireEnergyCard
-	dw WaterEnergyCard
-	dw LightningEnergyCard
-	dw FightingEnergyCard
-	dw PsychicEnergyCard
-	dw DoubleColorlessEnergyCard
-	dw BulbasaurCard
-	dw IvysaurCard
-	dw VenusaurLv64Card
-	dw VenusaurLv67Card
-	dw CaterpieCard
-	dw MetapodCard
-	dw ButterfreeCard
-	dw WeedleCard
-	dw KakunaCard
-	dw BeedrillCard
-	dw EkansCard
-	dw ArbokCard
-	dw NidoranFCard
-	dw NidorinaCard
-	dw NidoqueenCard
-	dw NidoranMCard
-	dw NidorinoCard
-	dw NidokingCard
-	dw ZubatCard
-	dw GolbatCard
-	dw OddishCard
-	dw GloomCard
-	dw VileplumeCard
-	dw ParasCard
-	dw ParasectCard
-	dw VenonatCard
-	dw VenomothCard
-	dw BellsproutCard
-	dw WeepinbellCard
-	dw VictreebelCard
-	dw GrimerCard
-	dw MukCard
-	dw ExeggcuteCard
-	dw ExeggutorCard
-	dw KoffingCard
-	dw WeezingCard
-	dw TangelaLv8Card
-	dw TangelaLv12Card
-	dw ScytherCard
-	dw PinsirCard
-	dw CharmanderCard
-	dw CharmeleonCard
-	dw CharizardCard
-	dw VulpixCard
-	dw NinetalesLv32Card
-	dw NinetalesLv35Card
-	dw GrowlitheCard
-	dw ArcanineLv34Card
-	dw ArcanineLv45Card
-	dw PonytaCard
-	dw RapidashCard
-	dw MagmarLv24Card
-	dw MagmarLv31Card
-	dw FlareonLv22Card
-	dw FlareonLv28Card
-	dw MoltresLv35Card
-	dw MoltresLv37Card
-	dw SquirtleCard
-	dw WartortleCard
-	dw BlastoiseCard
-	dw PsyduckCard
-	dw GolduckCard
-	dw PoliwagCard
-	dw PoliwhirlCard
-	dw PoliwrathCard
-	dw TentacoolCard
-	dw TentacruelCard
-	dw SeelCard
-	dw DewgongCard
-	dw ShellderCard
-	dw CloysterCard
-	dw KrabbyCard
-	dw KinglerCard
-	dw HorseaCard
-	dw SeadraCard
-	dw GoldeenCard
-	dw SeakingCard
-	dw StaryuCard
-	dw StarmieCard
-	dw MagikarpCard
-	dw GyaradosCard
-	dw LaprasCard
-	dw VaporeonLv29Card
-	dw VaporeonLv42Card
-	dw OmanyteCard
-	dw OmastarCard
-	dw ArticunoLv35Card
-	dw ArticunoLv37Card
-	dw PikachuLv12Card
-	dw PikachuLv14Card
-	dw PikachuLv16Card
-	dw PikachuAltLv16Card
-	dw FlyingPikachuCard
-	dw SurfingPikachuLv13Card
-	dw SurfingPikachuAltLv13Card
-	dw RaichuLv40Card
-	dw RaichuLv45Card
-	dw MagnemiteLv13Card
-	dw MagnemiteLv15Card
-	dw MagnetonLv28Card
-	dw MagnetonLv35Card
-	dw VoltorbCard
-	dw ElectrodeLv35Card
-	dw ElectrodeLv42Card
-	dw ElectabuzzLv20Card
-	dw ElectabuzzLv35Card
-	dw JolteonLv24Card
-	dw JolteonLv29Card
-	dw ZapdosLv40Card
-	dw ZapdosLv64Card
-	dw ZapdosLv68Card
-	dw SandshrewCard
-	dw SandslashCard
-	dw DiglettCard
-	dw DugtrioCard
-	dw MankeyCard
-	dw PrimeapeCard
-	dw MachopCard
-	dw MachokeCard
-	dw MachampCard
-	dw GeodudeCard
-	dw GravelerCard
-	dw GolemCard
-	dw OnixCard
-	dw CuboneCard
-	dw MarowakLv26Card
-	dw MarowakLv32Card
-	dw HitmonleeCard
-	dw HitmonchanCard
-	dw RhyhornCard
-	dw RhydonCard
-	dw KabutoCard
-	dw KabutopsCard
-	dw AerodactylCard
-	dw AbraCard
-	dw KadabraCard
-	dw AlakazamCard
-	dw SlowpokeLv9Card
-	dw SlowpokeLv18Card
-	dw SlowbroCard
-	dw GastlyLv8Card
-	dw GastlyLv17Card
-	dw HaunterLv17Card
-	dw HaunterLv22Card
-	dw GengarCard
-	dw DrowzeeCard
-	dw HypnoCard
-	dw MrMimeCard
-	dw JynxCard
-	dw MewtwoLv53Card
-	dw MewtwoLv60Card
-	dw MewtwoAltLV60Card
-	dw MewLv8Card
-	dw MewLv15Card
-	dw MewLv23Card
-	dw PidgeyCard
-	dw PidgeottoCard
-	dw PidgeotLv38Card
-	dw PidgeotLv40Card
-	dw RattataCard
-	dw RaticateCard
-	dw SpearowCard
-	dw FearowCard
-	dw ClefairyCard
-	dw ClefableCard
-	dw JigglypuffLv12Card
-	dw JigglypuffLv13Card
-	dw JigglypuffLv14Card
-	dw WigglytuffCard
-	dw MeowthLv14Card
-	dw MeowthLv15Card
-	dw PersianCard
-	dw FarfetchdCard
-	dw DoduoCard
-	dw DodrioCard
-	dw LickitungCard
-	dw ChanseyCard
-	dw KangaskhanCard
-	dw TaurosCard
-	dw DittoCard
-	dw EeveeCard
-	dw PorygonCard
-	dw SnorlaxCard
-	dw DratiniCard
-	dw DragonairCard
-	dw DragoniteLv41Card
-	dw DragoniteLv45Card
-	dw ProfessorOakCard
-	dw ImposterProfessorOakCard
-	dw BillCard
-	dw MrFujiCard
-	dw LassCard
-	dw ImakuniCard
-	dw PokemonTraderCard
-	dw PokemonBreederCard
-	dw ClefairyDollCard
-	dw MysteriousFossilCard
-	dw EnergyRetrievalCard
-	dw SuperEnergyRetrievalCard
-	dw EnergySearchCard
-	dw EnergyRemovalCard
-	dw SuperEnergyRemovalCard
-	dw SwitchCard
-	dw PokemonCenterCard
-	dw PokeBallCard
-	dw ScoopUpCard
-	dw ComputerSearchCard
-	dw PokedexCard
-	dw PlusPowerCard
-	dw DefenderCard
-	dw ItemFinderCard
-	dw GustOfWindCard
-	dw DevolutionSprayCard
-	dw PotionCard
-	dw SuperPotionCard
-	dw FullHealCard
-	dw ReviveCard
-	dw MaintenanceCard
-	dw PokemonFluteCard
-	dw GamblerCard
-	dw RecycleCard
-	dw NULL
-	assert_table_length NUM_CARDS + 2
-
 BulbasaurCard:
 	db TYPE_PKMN_GRASS ; type
 	gfx BulbasaurCardGfx ; gfx
 	tx BulbasaurName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db BULBASAUR
+	dw BULBASAUR
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -291,7 +54,7 @@ IvysaurCard:
 	tx IvysaurName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db IVYSAUR
+	dw IVYSAUR
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx BulbasaurName ; pre-evo name
@@ -341,7 +104,7 @@ VenusaurLv64Card:
 	tx VenusaurName ; name
 	db STAR ; rarity
 	db PROMOTIONAL | GB ; sets
-	db VENUSAUR_LV64
+	dw VENUSAUR_LV64
 	db 100 ; hp
 	db STAGE2 ; stage
 	tx IvysaurName ; pre-evo name
@@ -391,7 +154,7 @@ VenusaurLv67Card:
 	tx VenusaurName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db VENUSAUR_LV67
+	dw VENUSAUR_LV67
 	db 100 ; hp
 	db STAGE2 ; stage
 	tx IvysaurName ; pre-evo name
@@ -441,7 +204,7 @@ CaterpieCard:
 	tx CaterpieName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db CATERPIE
+	dw CATERPIE
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -491,7 +254,7 @@ MetapodCard:
 	tx MetapodName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db METAPOD
+	dw METAPOD
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx CaterpieName ; pre-evo name
@@ -541,7 +304,7 @@ ButterfreeCard:
 	tx ButterfreeName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db BUTTERFREE
+	dw BUTTERFREE
 	db 70 ; hp
 	db STAGE2 ; stage
 	tx MetapodName ; pre-evo name
@@ -591,7 +354,7 @@ WeedleCard:
 	tx WeedleName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db WEEDLE
+	dw WEEDLE
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -641,7 +404,7 @@ KakunaCard:
 	tx KakunaName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db KAKUNA
+	dw KAKUNA
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx WeedleName ; pre-evo name
@@ -691,7 +454,7 @@ BeedrillCard:
 	tx BeedrillName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db BEEDRILL
+	dw BEEDRILL
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx KakunaName ; pre-evo name
@@ -741,7 +504,7 @@ EkansCard:
 	tx EkansName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db EKANS
+	dw EKANS
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -791,7 +554,7 @@ ArbokCard:
 	tx ArbokName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db ARBOK
+	dw ARBOK
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx EkansName ; pre-evo name
@@ -841,7 +604,7 @@ NidoranFCard:
 	tx NidoranFName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db NIDORANF
+	dw NIDORANF
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -891,7 +654,7 @@ NidorinaCard:
 	tx NidorinaName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db NIDORINA
+	dw NIDORINA
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx NidoranFName ; pre-evo name
@@ -941,7 +704,7 @@ NidoqueenCard:
 	tx NidoqueenName ; name
 	db STAR ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db NIDOQUEEN
+	dw NIDOQUEEN
 	db 90 ; hp
 	db STAGE2 ; stage
 	tx NidorinaName ; pre-evo name
@@ -991,7 +754,7 @@ NidoranMCard:
 	tx NidoranMName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db NIDORANM
+	dw NIDORANM
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1041,7 +804,7 @@ NidorinoCard:
 	tx NidorinoName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db NIDORINO
+	dw NIDORINO
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx NidoranMName ; pre-evo name
@@ -1091,7 +854,7 @@ NidokingCard:
 	tx NidokingName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db NIDOKING
+	dw NIDOKING
 	db 90 ; hp
 	db STAGE2 ; stage
 	tx NidorinoName ; pre-evo name
@@ -1141,7 +904,7 @@ ZubatCard:
 	tx ZubatName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db ZUBAT
+	dw ZUBAT
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1191,7 +954,7 @@ GolbatCard:
 	tx GolbatName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db GOLBAT
+	dw GOLBAT
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx ZubatName ; pre-evo name
@@ -1241,7 +1004,7 @@ OddishCard:
 	tx OddishName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db ODDISH
+	dw ODDISH
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1291,7 +1054,7 @@ GloomCard:
 	tx GloomName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db GLOOM
+	dw GLOOM
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx OddishName ; pre-evo name
@@ -1341,7 +1104,7 @@ VileplumeCard:
 	tx VileplumeName ; name
 	db STAR ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db VILEPLUME
+	dw VILEPLUME
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx GloomName ; pre-evo name
@@ -1391,7 +1154,7 @@ ParasCard:
 	tx ParasName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db PARAS
+	dw PARAS
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1441,7 +1204,7 @@ ParasectCard:
 	tx ParasectName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db PARASECT
+	dw PARASECT
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx ParasName ; pre-evo name
@@ -1491,7 +1254,7 @@ VenonatCard:
 	tx VenonatName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db VENONAT
+	dw VENONAT
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1541,7 +1304,7 @@ VenomothCard:
 	tx VenomothName ; name
 	db STAR ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db VENOMOTH
+	dw VENOMOTH
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx VenonatName ; pre-evo name
@@ -1591,7 +1354,7 @@ BellsproutCard:
 	tx BellsproutName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db BELLSPROUT
+	dw BELLSPROUT
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1641,7 +1404,7 @@ WeepinbellCard:
 	tx WeepinbellName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db WEEPINBELL
+	dw WEEPINBELL
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx BellsproutName ; pre-evo name
@@ -1691,7 +1454,7 @@ VictreebelCard:
 	tx VictreebelName ; name
 	db STAR ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db VICTREEBEL
+	dw VICTREEBEL
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx WeepinbellName ; pre-evo name
@@ -1741,7 +1504,7 @@ GrimerCard:
 	tx GrimerName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db GRIMER
+	dw GRIMER
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1791,7 +1554,7 @@ MukCard:
 	tx MukName ; name
 	db STAR ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db MUK
+	dw MUK
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx GrimerName ; pre-evo name
@@ -1841,7 +1604,7 @@ ExeggcuteCard:
 	tx ExeggcuteName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db EXEGGCUTE
+	dw EXEGGCUTE
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1891,7 +1654,7 @@ ExeggutorCard:
 	tx ExeggutorName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db EXEGGUTOR
+	dw EXEGGUTOR
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx ExeggcuteName ; pre-evo name
@@ -1941,7 +1704,7 @@ KoffingCard:
 	tx KoffingName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | NONE ; sets
-	db KOFFING
+	dw KOFFING
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -1991,7 +1754,7 @@ WeezingCard:
 	tx WeezingName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db WEEZING
+	dw WEEZING
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx KoffingName ; pre-evo name
@@ -2041,7 +1804,7 @@ TangelaLv8Card:
 	tx TangelaName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | NONE ; sets
-	db TANGELA_LV8
+	dw TANGELA_LV8
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2091,7 +1854,7 @@ TangelaLv12Card:
 	tx TangelaName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | GB ; sets
-	db TANGELA_LV12
+	dw TANGELA_LV12
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2141,7 +1904,7 @@ ScytherCard:
 	tx ScytherName ; name
 	db STAR ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db SCYTHER
+	dw SCYTHER
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2191,7 +1954,7 @@ PinsirCard:
 	tx PinsirName ; name
 	db STAR ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db PINSIR
+	dw PINSIR
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2241,7 +2004,7 @@ CharmanderCard:
 	tx CharmanderName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db CHARMANDER
+	dw CHARMANDER
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2291,7 +2054,7 @@ CharmeleonCard:
 	tx CharmeleonName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db CHARMELEON
+	dw CHARMELEON
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx CharmanderName ; pre-evo name
@@ -2341,7 +2104,7 @@ CharizardCard:
 	tx CharizardName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db CHARIZARD
+	dw CHARIZARD
 	db 120 ; hp
 	db STAGE2 ; stage
 	tx CharmeleonName ; pre-evo name
@@ -2391,7 +2154,7 @@ VulpixCard:
 	tx VulpixName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | NONE ; sets
-	db VULPIX
+	dw VULPIX
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2441,7 +2204,7 @@ NinetalesLv32Card:
 	tx NinetalesName ; name
 	db STAR ; rarity
 	db MYSTERY | NONE ; sets
-	db NINETALES_LV32
+	dw NINETALES_LV32
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx VulpixName ; pre-evo name
@@ -2491,7 +2254,7 @@ NinetalesLv35Card:
 	tx NinetalesName ; name
 	db STAR ; rarity
 	db LABORATORY | GB ; sets
-	db NINETALES_LV35
+	dw NINETALES_LV35
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx VulpixName ; pre-evo name
@@ -2541,7 +2304,7 @@ GrowlitheCard:
 	tx GrowlitheName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db GROWLITHE
+	dw GROWLITHE
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2591,7 +2354,7 @@ ArcanineLv34Card:
 	tx ArcanineName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db ARCANINE_LV34
+	dw ARCANINE_LV34
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx GrowlitheName ; pre-evo name
@@ -2641,7 +2404,7 @@ ArcanineLv45Card:
 	tx ArcanineName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db ARCANINE_LV45
+	dw ARCANINE_LV45
 	db 100 ; hp
 	db STAGE1 ; stage
 	tx GrowlitheName ; pre-evo name
@@ -2691,7 +2454,7 @@ PonytaCard:
 	tx PonytaName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db PONYTA
+	dw PONYTA
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2741,7 +2504,7 @@ RapidashCard:
 	tx RapidashName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db RAPIDASH
+	dw RAPIDASH
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx PonytaName ; pre-evo name
@@ -2791,7 +2554,7 @@ MagmarLv24Card:
 	tx MagmarName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db MAGMAR_LV24
+	dw MAGMAR_LV24
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2841,7 +2604,7 @@ MagmarLv31Card:
 	tx MagmarName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db MAGMAR_LV31
+	dw MAGMAR_LV31
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -2891,7 +2654,7 @@ FlareonLv22Card:
 	tx FlareonName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | GB ; sets
-	db FLAREON_LV22
+	dw FLAREON_LV22
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx EeveeName ; pre-evo name
@@ -2941,7 +2704,7 @@ FlareonLv28Card:
 	tx FlareonName ; name
 	db STAR ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db FLAREON_LV28
+	dw FLAREON_LV28
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx EeveeName ; pre-evo name
@@ -2991,7 +2754,7 @@ MoltresLv35Card:
 	tx MoltresName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db MOLTRES_LV35
+	dw MOLTRES_LV35
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3041,7 +2804,7 @@ MoltresLv37Card:
 	tx MoltresName ; name
 	db STAR ; rarity
 	db PROMOTIONAL | GB ; sets
-	db MOLTRES_LV37
+	dw MOLTRES_LV37
 	db 100 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3091,7 +2854,7 @@ SquirtleCard:
 	tx SquirtleName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db SQUIRTLE
+	dw SQUIRTLE
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3141,7 +2904,7 @@ WartortleCard:
 	tx WartortleName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db WARTORTLE
+	dw WARTORTLE
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx SquirtleName ; pre-evo name
@@ -3191,7 +2954,7 @@ BlastoiseCard:
 	tx BlastoiseName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db BLASTOISE
+	dw BLASTOISE
 	db 100 ; hp
 	db STAGE2 ; stage
 	tx WartortleName ; pre-evo name
@@ -3241,7 +3004,7 @@ PsyduckCard:
 	tx PsyduckName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db PSYDUCK
+	dw PSYDUCK
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3291,7 +3054,7 @@ GolduckCard:
 	tx GolduckName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db GOLDUCK
+	dw GOLDUCK
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx PsyduckName ; pre-evo name
@@ -3341,7 +3104,7 @@ PoliwagCard:
 	tx PoliwagName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | NONE ; sets
-	db POLIWAG
+	dw POLIWAG
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3391,7 +3154,7 @@ PoliwhirlCard:
 	tx PoliwhirlName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | NONE ; sets
-	db POLIWHIRL
+	dw POLIWHIRL
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx PoliwagName ; pre-evo name
@@ -3441,7 +3204,7 @@ PoliwrathCard:
 	tx PoliwrathName ; name
 	db STAR ; rarity
 	db LABORATORY | NONE ; sets
-	db POLIWRATH
+	dw POLIWRATH
 	db 90 ; hp
 	db STAGE2 ; stage
 	tx PoliwhirlName ; pre-evo name
@@ -3491,7 +3254,7 @@ TentacoolCard:
 	tx TentacoolName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db TENTACOOL
+	dw TENTACOOL
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3541,7 +3304,7 @@ TentacruelCard:
 	tx TentacruelName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db TENTACRUEL
+	dw TENTACRUEL
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx TentacoolName ; pre-evo name
@@ -3591,7 +3354,7 @@ SeelCard:
 	tx SeelName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db SEEL
+	dw SEEL
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3641,7 +3404,7 @@ DewgongCard:
 	tx DewgongName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db DEWGONG
+	dw DEWGONG
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx SeelName ; pre-evo name
@@ -3691,7 +3454,7 @@ ShellderCard:
 	tx ShellderName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db SHELLDER
+	dw SHELLDER
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3741,7 +3504,7 @@ CloysterCard:
 	tx CloysterName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db CLOYSTER
+	dw CLOYSTER
 	db 50 ; hp
 	db STAGE1 ; stage
 	tx ShellderName ; pre-evo name
@@ -3791,7 +3554,7 @@ KrabbyCard:
 	tx KrabbyName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db KRABBY
+	dw KRABBY
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3841,7 +3604,7 @@ KinglerCard:
 	tx KinglerName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db KINGLER
+	dw KINGLER
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx KrabbyName ; pre-evo name
@@ -3891,7 +3654,7 @@ HorseaCard:
 	tx HorseaName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db HORSEA
+	dw HORSEA
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -3941,7 +3704,7 @@ SeadraCard:
 	tx SeadraName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db SEADRA
+	dw SEADRA
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx HorseaName ; pre-evo name
@@ -3991,7 +3754,7 @@ GoldeenCard:
 	tx GoldeenName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db GOLDEEN
+	dw GOLDEEN
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4041,7 +3804,7 @@ SeakingCard:
 	tx SeakingName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db SEAKING
+	dw SEAKING
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx GoldeenName ; pre-evo name
@@ -4091,7 +3854,7 @@ StaryuCard:
 	tx StaryuName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db STARYU
+	dw STARYU
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4141,7 +3904,7 @@ StarmieCard:
 	tx StarmieName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db STARMIE
+	dw STARMIE
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx StaryuName ; pre-evo name
@@ -4191,7 +3954,7 @@ MagikarpCard:
 	tx MagikarpName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db MAGIKARP
+	dw MAGIKARP
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4241,7 +4004,7 @@ GyaradosCard:
 	tx GyaradosName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db GYARADOS
+	dw GYARADOS
 	db 100 ; hp
 	db STAGE1 ; stage
 	tx MagikarpName ; pre-evo name
@@ -4291,7 +4054,7 @@ LaprasCard:
 	tx LaprasName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db LAPRAS
+	dw LAPRAS
 	db 80 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4341,7 +4104,7 @@ VaporeonLv29Card:
 	tx VaporeonName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | GB ; sets
-	db VAPOREON_LV29
+	dw VAPOREON_LV29
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx EeveeName ; pre-evo name
@@ -4391,7 +4154,7 @@ VaporeonLv42Card:
 	tx VaporeonName ; name
 	db STAR ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db VAPOREON_LV42
+	dw VAPOREON_LV42
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx EeveeName ; pre-evo name
@@ -4441,7 +4204,7 @@ OmanyteCard:
 	tx OmanyteName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db OMANYTE
+	dw OMANYTE
 	db 40 ; hp
 	db STAGE1 ; stage
 	tx MysteriousFossilName ; pre-evo name
@@ -4491,7 +4254,7 @@ OmastarCard:
 	tx OmastarName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db OMASTAR
+	dw OMASTAR
 	db 70 ; hp
 	db STAGE2 ; stage
 	tx OmanyteName ; pre-evo name
@@ -4541,7 +4304,7 @@ ArticunoLv35Card:
 	tx ArticunoName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db ARTICUNO_LV35
+	dw ARTICUNO_LV35
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4591,7 +4354,7 @@ ArticunoLv37Card:
 	tx ArticunoName ; name
 	db STAR ; rarity
 	db PROMOTIONAL | GB ; sets
-	db ARTICUNO_LV37
+	dw ARTICUNO_LV37
 	db 100 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4641,7 +4404,7 @@ PikachuLv12Card:
 	tx PikachuName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db PIKACHU_LV12
+	dw PIKACHU_LV12
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4691,7 +4454,7 @@ PikachuLv14Card:
 	tx PikachuName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db PIKACHU_LV14
+	dw PIKACHU_LV14
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4741,7 +4504,7 @@ PikachuLv16Card:
 	tx PikachuName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db PIKACHU_LV16
+	dw PIKACHU_LV16
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4791,7 +4554,7 @@ PikachuAltLv16Card:
 	tx PikachuName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db PIKACHU_ALT_LV16
+	dw PIKACHU_ALT_LV16
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4841,7 +4604,7 @@ FlyingPikachuCard:
 	tx FlyingPikachuName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db FLYING_PIKACHU
+	dw FLYING_PIKACHU
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4891,7 +4654,7 @@ SurfingPikachuLv13Card:
 	tx SurfingPikachuName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db SURFING_PIKACHU_LV13
+	dw SURFING_PIKACHU_LV13
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4941,7 +4704,7 @@ SurfingPikachuAltLv13Card:
 	tx SurfingPikachuName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db SURFING_PIKACHU_ALT_LV13
+	dw SURFING_PIKACHU_ALT_LV13
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -4991,7 +4754,7 @@ RaichuLv40Card:
 	tx RaichuName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db RAICHU_LV40
+	dw RAICHU_LV40
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx PikachuName ; pre-evo name
@@ -5041,7 +4804,7 @@ RaichuLv45Card:
 	tx RaichuName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db RAICHU_LV45
+	dw RAICHU_LV45
 	db 90 ; hp
 	db STAGE1 ; stage
 	tx PikachuName ; pre-evo name
@@ -5091,7 +4854,7 @@ MagnemiteLv13Card:
 	tx MagnemiteName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db MAGNEMITE_LV13
+	dw MAGNEMITE_LV13
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5141,7 +4904,7 @@ MagnemiteLv15Card:
 	tx MagnemiteName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | GB ; sets
-	db MAGNEMITE_LV15
+	dw MAGNEMITE_LV15
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5191,7 +4954,7 @@ MagnetonLv28Card:
 	tx MagnetonName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db MAGNETON_LV28
+	dw MAGNETON_LV28
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx MagnemiteName ; pre-evo name
@@ -5241,7 +5004,7 @@ MagnetonLv35Card:
 	tx MagnetonName ; name
 	db STAR ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db MAGNETON_LV35
+	dw MAGNETON_LV35
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx MagnemiteName ; pre-evo name
@@ -5291,7 +5054,7 @@ VoltorbCard:
 	tx VoltorbName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | NONE ; sets
-	db VOLTORB
+	dw VOLTORB
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5341,7 +5104,7 @@ ElectrodeLv35Card:
 	tx ElectrodeName ; name
 	db STAR ; rarity
 	db LABORATORY | GB ; sets
-	db ELECTRODE_LV35
+	dw ELECTRODE_LV35
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx VoltorbName ; pre-evo name
@@ -5391,7 +5154,7 @@ ElectrodeLv42Card:
 	tx ElectrodeName ; name
 	db STAR ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db ELECTRODE_LV42
+	dw ELECTRODE_LV42
 	db 90 ; hp
 	db STAGE1 ; stage
 	tx VoltorbName ; pre-evo name
@@ -5441,7 +5204,7 @@ ElectabuzzLv20Card:
 	tx ElectabuzzName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db ELECTABUZZ_LV20
+	dw ELECTABUZZ_LV20
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5491,7 +5254,7 @@ ElectabuzzLv35Card:
 	tx ElectabuzzName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db ELECTABUZZ_LV35
+	dw ELECTABUZZ_LV35
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5541,7 +5304,7 @@ JolteonLv24Card:
 	tx JolteonName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | GB ; sets
-	db JOLTEON_LV24
+	dw JOLTEON_LV24
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx EeveeName ; pre-evo name
@@ -5591,7 +5354,7 @@ JolteonLv29Card:
 	tx JolteonName ; name
 	db STAR ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db JOLTEON_LV29
+	dw JOLTEON_LV29
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx EeveeName ; pre-evo name
@@ -5641,7 +5404,7 @@ ZapdosLv40Card:
 	tx ZapdosName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db ZAPDOS_LV40
+	dw ZAPDOS_LV40
 	db 80 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5691,7 +5454,7 @@ ZapdosLv64Card:
 	tx ZapdosName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db ZAPDOS_LV64
+	dw ZAPDOS_LV64
 	db 90 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5741,7 +5504,7 @@ ZapdosLv68Card:
 	tx ZapdosName ; name
 	db STAR ; rarity
 	db PROMOTIONAL | GB ; sets
-	db ZAPDOS_LV68
+	dw ZAPDOS_LV68
 	db 100 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5791,7 +5554,7 @@ SandshrewCard:
 	tx SandshrewName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db SANDSHREW
+	dw SANDSHREW
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5841,7 +5604,7 @@ SandslashCard:
 	tx SandslashName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db SANDSLASH
+	dw SANDSLASH
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx SandshrewName ; pre-evo name
@@ -5891,7 +5654,7 @@ DiglettCard:
 	tx DiglettName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db DIGLETT
+	dw DIGLETT
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -5941,7 +5704,7 @@ DugtrioCard:
 	tx DugtrioName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db DUGTRIO
+	dw DUGTRIO
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx DiglettName ; pre-evo name
@@ -5991,7 +5754,7 @@ MankeyCard:
 	tx MankeyName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db MANKEY
+	dw MANKEY
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6041,7 +5804,7 @@ PrimeapeCard:
 	tx PrimeapeName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db PRIMEAPE
+	dw PRIMEAPE
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx MankeyName ; pre-evo name
@@ -6091,7 +5854,7 @@ MachopCard:
 	tx MachopName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db MACHOP
+	dw MACHOP
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6141,7 +5904,7 @@ MachokeCard:
 	tx MachokeName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db MACHOKE
+	dw MACHOKE
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx MachopName ; pre-evo name
@@ -6191,7 +5954,7 @@ MachampCard:
 	tx MachampName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db MACHAMP
+	dw MACHAMP
 	db 100 ; hp
 	db STAGE2 ; stage
 	tx MachokeName ; pre-evo name
@@ -6241,7 +6004,7 @@ GeodudeCard:
 	tx GeodudeName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db GEODUDE
+	dw GEODUDE
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6291,7 +6054,7 @@ GravelerCard:
 	tx GravelerName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db GRAVELER
+	dw GRAVELER
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx GeodudeName ; pre-evo name
@@ -6341,7 +6104,7 @@ GolemCard:
 	tx GolemName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db GOLEM
+	dw GOLEM
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx GravelerName ; pre-evo name
@@ -6391,7 +6154,7 @@ OnixCard:
 	tx OnixName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | NONE ; sets
-	db ONIX
+	dw ONIX
 	db 90 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6441,7 +6204,7 @@ CuboneCard:
 	tx CuboneName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db CUBONE
+	dw CUBONE
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6491,7 +6254,7 @@ MarowakLv26Card:
 	tx MarowakName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db MAROWAK_LV26
+	dw MAROWAK_LV26
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx CuboneName ; pre-evo name
@@ -6541,7 +6304,7 @@ MarowakLv32Card:
 	tx MarowakName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | GB ; sets
-	db MAROWAK_LV32
+	dw MAROWAK_LV32
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx CuboneName ; pre-evo name
@@ -6591,7 +6354,7 @@ HitmonleeCard:
 	tx HitmonleeName ; name
 	db STAR ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db HITMONLEE
+	dw HITMONLEE
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6641,7 +6404,7 @@ HitmonchanCard:
 	tx HitmonchanName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db HITMONCHAN
+	dw HITMONCHAN
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6691,7 +6454,7 @@ RhyhornCard:
 	tx RhyhornName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db RHYHORN
+	dw RHYHORN
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6741,7 +6504,7 @@ RhydonCard:
 	tx RhydonName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db RHYDON
+	dw RHYDON
 	db 100 ; hp
 	db STAGE1 ; stage
 	tx RhyhornName ; pre-evo name
@@ -6791,7 +6554,7 @@ KabutoCard:
 	tx KabutoName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db KABUTO
+	dw KABUTO
 	db 30 ; hp
 	db STAGE1 ; stage
 	tx MysteriousFossilName ; pre-evo name
@@ -6841,7 +6604,7 @@ KabutopsCard:
 	tx KabutopsName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db KABUTOPS
+	dw KABUTOPS
 	db 60 ; hp
 	db STAGE2 ; stage
 	tx KabutoName ; pre-evo name
@@ -6891,7 +6654,7 @@ AerodactylCard:
 	tx AerodactylName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db AERODACTYL
+	dw AERODACTYL
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx MysteriousFossilName ; pre-evo name
@@ -6941,7 +6704,7 @@ AbraCard:
 	tx AbraName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db ABRA
+	dw ABRA
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -6991,7 +6754,7 @@ KadabraCard:
 	tx KadabraName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db KADABRA
+	dw KADABRA
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx AbraName ; pre-evo name
@@ -7041,7 +6804,7 @@ AlakazamCard:
 	tx AlakazamName ; name
 	db STAR ; rarity
 	db MYSTERY | NONE ; sets
-	db ALAKAZAM
+	dw ALAKAZAM
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx KadabraName ; pre-evo name
@@ -7091,7 +6854,7 @@ SlowpokeLv9Card:
 	tx SlowpokeName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db SLOWPOKE_LV9
+	dw SLOWPOKE_LV9
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7141,7 +6904,7 @@ SlowpokeLv18Card:
 	tx SlowpokeName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db SLOWPOKE_LV18
+	dw SLOWPOKE_LV18
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7191,7 +6954,7 @@ SlowbroCard:
 	tx SlowbroName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db SLOWBRO
+	dw SLOWBRO
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx SlowpokeName ; pre-evo name
@@ -7241,7 +7004,7 @@ GastlyLv8Card:
 	tx GastlyName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db GASTLY_LV8
+	dw GASTLY_LV8
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7291,7 +7054,7 @@ GastlyLv17Card:
 	tx GastlyName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db GASTLY_LV17
+	dw GASTLY_LV17
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7341,7 +7104,7 @@ HaunterLv17Card:
 	tx HaunterName ; name
 	db STAR ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db HAUNTER_LV17
+	dw HAUNTER_LV17
 	db 50 ; hp
 	db STAGE1 ; stage
 	tx GastlyName ; pre-evo name
@@ -7391,7 +7154,7 @@ HaunterLv22Card:
 	tx HaunterName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db HAUNTER_LV22
+	dw HAUNTER_LV22
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx GastlyName ; pre-evo name
@@ -7441,7 +7204,7 @@ GengarCard:
 	tx GengarName ; name
 	db STAR ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db GENGAR
+	dw GENGAR
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx HaunterName ; pre-evo name
@@ -7491,7 +7254,7 @@ DrowzeeCard:
 	tx DrowzeeName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | NONE ; sets
-	db DROWZEE
+	dw DROWZEE
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7541,7 +7304,7 @@ HypnoCard:
 	tx HypnoName ; name
 	db STAR ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db HYPNO
+	dw HYPNO
 	db 90 ; hp
 	db STAGE1 ; stage
 	tx DrowzeeName ; pre-evo name
@@ -7591,7 +7354,7 @@ MrMimeCard:
 	tx MrMimeName ; name
 	db STAR ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db MR_MIME
+	dw MR_MIME
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7641,7 +7404,7 @@ JynxCard:
 	tx JynxName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db JYNX
+	dw JYNX
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7691,7 +7454,7 @@ MewtwoLv53Card:
 	tx MewtwoName ; name
 	db STAR ; rarity
 	db LABORATORY | NONE ; sets
-	db MEWTWO_LV53
+	dw MEWTWO_LV53
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7741,7 +7504,7 @@ MewtwoLv60Card:
 	tx MewtwoName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db MEWTWO_LV60
+	dw MEWTWO_LV60
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7791,7 +7554,7 @@ MewtwoAltLV60Card:
 	tx MewtwoName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db MEWTWO_ALT_LV60
+	dw MEWTWO_ALT_LV60
 	db 70 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7841,7 +7604,7 @@ MewLv8Card:
 	tx MewName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db MEW_LV8
+	dw MEW_LV8
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7891,7 +7654,7 @@ MewLv15Card:
 	tx MewName ; name
 	db STAR ; rarity
 	db PROMOTIONAL | GB ; sets
-	db MEW_LV15
+	dw MEW_LV15
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7941,7 +7704,7 @@ MewLv23Card:
 	tx MewName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db MEW_LV23
+	dw MEW_LV23
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -7991,7 +7754,7 @@ PidgeyCard:
 	tx PidgeyName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db PIDGEY
+	dw PIDGEY
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8041,7 +7804,7 @@ PidgeottoCard:
 	tx PidgeottoName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db PIDGEOTTO
+	dw PIDGEOTTO
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx PidgeyName ; pre-evo name
@@ -8091,7 +7854,7 @@ PidgeotLv38Card:
 	tx PidgeotName ; name
 	db STAR ; rarity
 	db LABORATORY | GB ; sets
-	db PIDGEOT_LV38
+	dw PIDGEOT_LV38
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx PidgeottoName ; pre-evo name
@@ -8141,7 +7904,7 @@ PidgeotLv40Card:
 	tx PidgeotName ; name
 	db STAR ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db PIDGEOT_LV40
+	dw PIDGEOT_LV40
 	db 80 ; hp
 	db STAGE2 ; stage
 	tx PidgeottoName ; pre-evo name
@@ -8191,7 +7954,7 @@ RattataCard:
 	tx RattataName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db RATTATA
+	dw RATTATA
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8241,7 +8004,7 @@ RaticateCard:
 	tx RaticateName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db RATICATE
+	dw RATICATE
 	db 60 ; hp
 	db STAGE1 ; stage
 	tx RattataName ; pre-evo name
@@ -8291,7 +8054,7 @@ SpearowCard:
 	tx SpearowName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db SPEAROW
+	dw SPEAROW
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8341,7 +8104,7 @@ FearowCard:
 	tx FearowName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db FEAROW
+	dw FEAROW
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx SpearowName ; pre-evo name
@@ -8391,7 +8154,7 @@ ClefairyCard:
 	tx ClefairyName ; name
 	db STAR ; rarity
 	db MYSTERY | NONE ; sets
-	db CLEFAIRY
+	dw CLEFAIRY
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8441,7 +8204,7 @@ ClefableCard:
 	tx ClefableName ; name
 	db STAR ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db CLEFABLE
+	dw CLEFABLE
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx ClefairyName ; pre-evo name
@@ -8491,7 +8254,7 @@ JigglypuffLv12Card:
 	tx JigglypuffName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db JIGGLYPUFF_LV12
+	dw JIGGLYPUFF_LV12
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8541,7 +8304,7 @@ JigglypuffLv13Card:
 	tx JigglypuffName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | GB ; sets
-	db JIGGLYPUFF_LV13
+	dw JIGGLYPUFF_LV13
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8591,7 +8354,7 @@ JigglypuffLv14Card:
 	tx JigglypuffName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db JIGGLYPUFF_LV14
+	dw JIGGLYPUFF_LV14
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8641,7 +8404,7 @@ WigglytuffCard:
 	tx WigglytuffName ; name
 	db STAR ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db WIGGLYTUFF
+	dw WIGGLYTUFF
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx JigglypuffName ; pre-evo name
@@ -8691,7 +8454,7 @@ MeowthLv14Card:
 	tx MeowthName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | GB ; sets
-	db MEOWTH_LV14
+	dw MEOWTH_LV14
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8741,7 +8504,7 @@ MeowthLv15Card:
 	tx MeowthName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db MEOWTH_LV15
+	dw MEOWTH_LV15
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8791,7 +8554,7 @@ PersianCard:
 	tx PersianName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db PERSIAN
+	dw PERSIAN
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx MeowthName ; pre-evo name
@@ -8841,7 +8604,7 @@ FarfetchdCard:
 	tx FarfetchdName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | NONE ; sets
-	db FARFETCHD
+	dw FARFETCHD
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8891,7 +8654,7 @@ DoduoCard:
 	tx DoduoName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | NONE ; sets
-	db DODUO
+	dw DODUO
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -8941,7 +8704,7 @@ DodrioCard:
 	tx DodrioName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | JUNGLE ; sets
-	db DODRIO
+	dw DODRIO
 	db 70 ; hp
 	db STAGE1 ; stage
 	tx DoduoName ; pre-evo name
@@ -8991,7 +8754,7 @@ LickitungCard:
 	tx LickitungName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db LICKITUNG
+	dw LICKITUNG
 	db 90 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9041,7 +8804,7 @@ ChanseyCard:
 	tx ChanseyName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db CHANSEY
+	dw CHANSEY
 	db 120 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9091,7 +8854,7 @@ KangaskhanCard:
 	tx KangaskhanName ; name
 	db STAR ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db KANGASKHAN
+	dw KANGASKHAN
 	db 90 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9141,7 +8904,7 @@ TaurosCard:
 	tx TaurosName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | JUNGLE ; sets
-	db TAUROS
+	dw TAUROS
 	db 60 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9191,7 +8954,7 @@ DittoCard:
 	tx DittoName ; name
 	db STAR ; rarity
 	db LABORATORY | GB ; sets
-	db DITTO
+	dw DITTO
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9241,7 +9004,7 @@ EeveeCard:
 	tx EeveeName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | JUNGLE ; sets
-	db EEVEE
+	dw EEVEE
 	db 50 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9291,7 +9054,7 @@ PorygonCard:
 	tx PorygonName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | NONE ; sets
-	db PORYGON
+	dw PORYGON
 	db 30 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9341,7 +9104,7 @@ SnorlaxCard:
 	tx SnorlaxName ; name
 	db STAR ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db SNORLAX
+	dw SNORLAX
 	db 90 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9391,7 +9154,7 @@ DratiniCard:
 	tx DratiniName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | NONE ; sets
-	db DRATINI
+	dw DRATINI
 	db 40 ; hp
 	db BASIC ; stage
 	dw NONE ; pre-evo name
@@ -9441,7 +9204,7 @@ DragonairCard:
 	tx DragonairName ; name
 	db STAR ; rarity
 	db MYSTERY | NONE ; sets
-	db DRAGONAIR
+	dw DRAGONAIR
 	db 80 ; hp
 	db STAGE1 ; stage
 	tx DratiniName ; pre-evo name
@@ -9491,7 +9254,7 @@ DragoniteLv41Card:
 	tx DragoniteName ; name
 	db STAR ; rarity
 	db PROMOTIONAL | GB ; sets
-	db DRAGONITE_LV41
+	dw DRAGONITE_LV41
 	db 100 ; hp
 	db STAGE2 ; stage
 	tx DragonairName ; pre-evo name
@@ -9541,7 +9304,7 @@ DragoniteLv45Card:
 	tx DragoniteName ; name
 	db STAR ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db DRAGONITE_LV45
+	dw DRAGONITE_LV45
 	db 100 ; hp
 	db STAGE2 ; stage
 	tx DragonairName ; pre-evo name
@@ -9591,7 +9354,7 @@ GrassEnergyCard:
 	tx GrassEnergyName ; name
 	db CIRCLE ; rarity
 	db ENERGY | NONE ; sets
-	db GRASS_ENERGY
+	dw GRASS_ENERGY
 	dw GrassEnergyEffectCommands ; effect commands
 	tx GrassEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -9602,7 +9365,7 @@ FireEnergyCard:
 	tx FireEnergyName ; name
 	db CIRCLE ; rarity
 	db ENERGY | NONE ; sets
-	db FIRE_ENERGY
+	dw FIRE_ENERGY
 	dw FireEnergyEffectCommands ; effect commands
 	tx FireEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -9613,7 +9376,7 @@ WaterEnergyCard:
 	tx WaterEnergyName ; name
 	db CIRCLE ; rarity
 	db ENERGY | NONE ; sets
-	db WATER_ENERGY
+	dw WATER_ENERGY
 	dw WaterEnergyEffectCommands ; effect commands
 	tx WaterEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -9624,7 +9387,7 @@ LightningEnergyCard:
 	tx LightningEnergyName ; name
 	db CIRCLE ; rarity
 	db ENERGY | NONE ; sets
-	db LIGHTNING_ENERGY
+	dw LIGHTNING_ENERGY
 	dw LightningEnergyEffectCommands ; effect commands
 	tx LightningEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -9635,7 +9398,7 @@ FightingEnergyCard:
 	tx FightingEnergyName ; name
 	db CIRCLE ; rarity
 	db ENERGY | NONE ; sets
-	db FIGHTING_ENERGY
+	dw FIGHTING_ENERGY
 	dw FightingEnergyEffectCommands ; effect commands
 	tx FightingEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -9646,7 +9409,7 @@ PsychicEnergyCard:
 	tx PsychicEnergyName ; name
 	db CIRCLE ; rarity
 	db ENERGY | NONE ; sets
-	db PSYCHIC_ENERGY
+	dw PSYCHIC_ENERGY
 	dw PsychicEnergyEffectCommands ; effect commands
 	tx PsychicEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -9657,7 +9420,7 @@ DoubleColorlessEnergyCard:
 	tx DoubleColorlessEnergyName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | NONE ; sets
-	db DOUBLE_COLORLESS_ENERGY
+	dw DOUBLE_COLORLESS_ENERGY
 	dw DoubleColorlessEnergyEffectCommands ; effect commands
 	tx DoubleColorlessEnergyDescription ; description
 	dw NONE ; description (cont)
@@ -9668,7 +9431,7 @@ ProfessorOakCard:
 	tx ProfessorOakName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db PROFESSOR_OAK
+	dw PROFESSOR_OAK
 	dw ProfessorOakEffectCommands ; effect commands
 	tx ProfessorOakDescription ; description
 	dw NONE ; description (cont)
@@ -9679,7 +9442,7 @@ ImposterProfessorOakCard:
 	tx ImposterProfessorOakName ; name
 	db STAR ; rarity
 	db LABORATORY | NONE ; sets
-	db IMPOSTER_PROFESSOR_OAK
+	dw IMPOSTER_PROFESSOR_OAK
 	dw ImposterProfessorOakEffectCommands ; effect commands
 	tx ImposterProfessorOakDescription ; description
 	dw NONE ; description (cont)
@@ -9690,7 +9453,7 @@ BillCard:
 	tx BillName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db BILL
+	dw BILL
 	dw BillEffectCommands ; effect commands
 	tx BillDescription ; description
 	dw NONE ; description (cont)
@@ -9701,7 +9464,7 @@ MrFujiCard:
 	tx MrFujiName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db MR_FUJI
+	dw MR_FUJI
 	dw MrFujiEffectCommands ; effect commands
 	tx MrFujiDescription ; description
 	dw NONE ; description (cont)
@@ -9712,7 +9475,7 @@ LassCard:
 	tx LassName ; name
 	db STAR ; rarity
 	db LABORATORY | NONE ; sets
-	db LASS
+	dw LASS
 	dw LassEffectCommands ; effect commands
 	tx LassDescription ; description
 	dw NONE ; description (cont)
@@ -9723,7 +9486,7 @@ ImakuniCard:
 	tx ImakuniName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db IMAKUNI_CARD
+	dw IMAKUNI_CARD
 	dw ImakuniEffectCommands ; effect commands
 	tx ImakuniDescription ; description
 	dw NONE ; description (cont)
@@ -9734,7 +9497,7 @@ PokemonTraderCard:
 	tx PokemonTraderName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db POKEMON_TRADER
+	dw POKEMON_TRADER
 	dw PokemonTraderEffectCommands ; effect commands
 	tx PokemonTraderDescription ; description
 	dw NONE ; description (cont)
@@ -9745,7 +9508,7 @@ PokemonBreederCard:
 	tx PokemonBreederName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db POKEMON_BREEDER
+	dw POKEMON_BREEDER
 	dw PokemonBreederEffectCommands ; effect commands
 	tx PokemonBreederDescription ; description
 	dw NONE ; description (cont)
@@ -9756,7 +9519,7 @@ ClefairyDollCard:
 	tx ClefairyDollName ; name
 	db STAR ; rarity
 	db EVOLUTION | NONE ; sets
-	db CLEFAIRY_DOLL
+	dw CLEFAIRY_DOLL
 	dw PlayThisAsBasicPokemonEffectCommands ; effect commands
 	tx ClefairyDollDescription ; description
 	tx ClefairyDollDescriptionCont ; description (cont)
@@ -9767,7 +9530,7 @@ MysteriousFossilCard:
 	tx MysteriousFossilName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | FOSSIL ; sets
-	db MYSTERIOUS_FOSSIL
+	dw MYSTERIOUS_FOSSIL
 	dw PlayThisAsBasicPokemonEffectCommands ; effect commands
 	tx MysteriousFossilDescription ; description
 	tx MysteriousFossilDescriptionCont ; description (cont)
@@ -9778,7 +9541,7 @@ EnergyRetrievalCard:
 	tx EnergyRetrievalName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db ENERGY_RETRIEVAL
+	dw ENERGY_RETRIEVAL
 	dw EnergyRetrievalEffectCommands ; effect commands
 	tx EnergyRetrievalDescription ; description
 	dw NONE ; description (cont)
@@ -9789,7 +9552,7 @@ SuperEnergyRetrievalCard:
 	tx SuperEnergyRetrievalName ; name
 	db PROMOSTAR ; rarity
 	db PROMOTIONAL | PRO ; sets
-	db SUPER_ENERGY_RETRIEVAL
+	dw SUPER_ENERGY_RETRIEVAL
 	dw SuperEnergyRetrievalEffectCommands ; effect commands
 	tx SuperEnergyRetrievalDescription ; description
 	dw NONE ; description (cont)
@@ -9800,7 +9563,7 @@ EnergySearchCard:
 	tx EnergySearchName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | FOSSIL ; sets
-	db ENERGY_SEARCH
+	dw ENERGY_SEARCH
 	dw EnergySearchEffectCommands ; effect commands
 	tx EnergySearchDescription ; description
 	dw NONE ; description (cont)
@@ -9811,7 +9574,7 @@ EnergyRemovalCard:
 	tx EnergyRemovalName ; name
 	db CIRCLE ; rarity
 	db MYSTERY | NONE ; sets
-	db ENERGY_REMOVAL
+	dw ENERGY_REMOVAL
 	dw EnergyRemovalEffectCommands ; effect commands
 	tx EnergyRemovalDescription ; description
 	dw NONE ; description (cont)
@@ -9822,7 +9585,7 @@ SuperEnergyRemovalCard:
 	tx SuperEnergyRemovalName ; name
 	db STAR ; rarity
 	db LABORATORY | NONE ; sets
-	db SUPER_ENERGY_REMOVAL
+	dw SUPER_ENERGY_REMOVAL
 	dw SuperEnergyRemovalEffectCommands ; effect commands
 	tx SuperEnergyRemovalDescription ; description
 	dw NONE ; description (cont)
@@ -9833,7 +9596,7 @@ SwitchCard:
 	tx SwitchName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db SWITCH
+	dw SWITCH
 	dw SwitchEffectCommands ; effect commands
 	tx SwitchDescription ; description
 	dw NONE ; description (cont)
@@ -9844,7 +9607,7 @@ PokemonCenterCard:
 	tx PokemonCenterName ; name
 	db DIAMOND ; rarity
 	db MYSTERY | NONE ; sets
-	db POKEMON_CENTER
+	dw POKEMON_CENTER
 	dw PokemonCenterEffectCommands ; effect commands
 	tx PokemonCenterDescription ; description
 	dw NONE ; description (cont)
@@ -9855,7 +9618,7 @@ PokeBallCard:
 	tx PokeBallName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | JUNGLE ; sets
-	db POKE_BALL
+	dw POKE_BALL
 	dw PokeBallEffectCommands ; effect commands
 	tx PokeBallDescription ; description
 	dw NONE ; description (cont)
@@ -9866,7 +9629,7 @@ ScoopUpCard:
 	tx ScoopUpName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db SCOOP_UP
+	dw SCOOP_UP
 	dw ScoopUpEffectCommands ; effect commands
 	tx ScoopUpDescription ; description
 	dw NONE ; description (cont)
@@ -9877,7 +9640,7 @@ ComputerSearchCard:
 	tx ComputerSearchName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db COMPUTER_SEARCH
+	dw COMPUTER_SEARCH
 	dw ComputerSearchEffectCommands ; effect commands
 	tx ComputerSearchDescription ; description
 	dw NONE ; description (cont)
@@ -9888,7 +9651,7 @@ PokedexCard:
 	tx PokedexName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | NONE ; sets
-	db POKEDEX
+	dw POKEDEX
 	dw PokedexEffectCommands ; effect commands
 	tx PokedexDescription ; description
 	dw NONE ; description (cont)
@@ -9899,7 +9662,7 @@ PlusPowerCard:
 	tx PlusPowerName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db PLUSPOWER
+	dw PLUSPOWER
 	dw PlusPowerEffectCommands ; effect commands
 	tx PlusPowerDescription ; description
 	dw NONE ; description (cont)
@@ -9910,7 +9673,7 @@ DefenderCard:
 	tx DefenderName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db DEFENDER
+	dw DEFENDER
 	dw DefenderEffectCommands ; effect commands
 	tx DefenderDescription ; description
 	dw NONE ; description (cont)
@@ -9921,7 +9684,7 @@ ItemFinderCard:
 	tx ItemFinderName ; name
 	db STAR ; rarity
 	db COLOSSEUM | NONE ; sets
-	db ITEM_FINDER
+	dw ITEM_FINDER
 	dw ItemFinderEffectCommands ; effect commands
 	tx ItemFinderDescription ; description
 	dw NONE ; description (cont)
@@ -9932,7 +9695,7 @@ GustOfWindCard:
 	tx GustOfWindName ; name
 	db CIRCLE ; rarity
 	db EVOLUTION | NONE ; sets
-	db GUST_OF_WIND
+	dw GUST_OF_WIND
 	dw GustOfWindEffectCommands ; effect commands
 	tx GustOfWindDescription ; description
 	dw NONE ; description (cont)
@@ -9943,7 +9706,7 @@ DevolutionSprayCard:
 	tx DevolutionSprayName ; name
 	db STAR ; rarity
 	db LABORATORY | NONE ; sets
-	db DEVOLUTION_SPRAY
+	dw DEVOLUTION_SPRAY
 	dw DevolutionSprayEffectCommands ; effect commands
 	tx DevolutionSprayDescription ; description
 	tx DevolutionSprayDescriptionCont ; description (cont)
@@ -9954,7 +9717,7 @@ PotionCard:
 	tx PotionName ; name
 	db CIRCLE ; rarity
 	db COLOSSEUM | NONE ; sets
-	db POTION
+	dw POTION
 	dw PotionEffectCommands ; effect commands
 	tx PotionDescription ; description
 	dw NONE ; description (cont)
@@ -9965,7 +9728,7 @@ SuperPotionCard:
 	tx SuperPotionName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db SUPER_POTION
+	dw SUPER_POTION
 	dw SuperPotionEffectCommands ; effect commands
 	tx SuperPotionDescription ; description
 	dw NONE ; description (cont)
@@ -9976,7 +9739,7 @@ FullHealCard:
 	tx FullHealName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db FULL_HEAL
+	dw FULL_HEAL
 	dw FullHealEffectCommands ; effect commands
 	tx FullHealDescription ; description
 	dw NONE ; description (cont)
@@ -9987,7 +9750,7 @@ ReviveCard:
 	tx ReviveName ; name
 	db DIAMOND ; rarity
 	db COLOSSEUM | NONE ; sets
-	db REVIVE
+	dw REVIVE
 	dw ReviveEffectCommands ; effect commands
 	tx ReviveDescription ; description
 	dw NONE ; description (cont)
@@ -9998,7 +9761,7 @@ MaintenanceCard:
 	tx MaintenanceName ; name
 	db DIAMOND ; rarity
 	db LABORATORY | NONE ; sets
-	db MAINTENANCE
+	dw MAINTENANCE
 	dw MaintenanceEffectCommands ; effect commands
 	tx MaintenanceDescription ; description
 	dw NONE ; description (cont)
@@ -10009,7 +9772,7 @@ PokemonFluteCard:
 	tx PokemonFluteName ; name
 	db DIAMOND ; rarity
 	db EVOLUTION | NONE ; sets
-	db POKEMON_FLUTE
+	dw POKEMON_FLUTE
 	dw PokemonFluteEffectCommands ; effect commands
 	tx PokemonFluteDescription ; description
 	dw NONE ; description (cont)
@@ -10020,7 +9783,7 @@ GamblerCard:
 	tx GamblerName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db GAMBLER
+	dw GAMBLER
 	dw GamblerEffectCommands ; effect commands
 	tx GamblerDescription ; description
 	dw NONE ; description (cont)
@@ -10031,7 +9794,7 @@ RecycleCard:
 	tx RecycleName ; name
 	db CIRCLE ; rarity
 	db LABORATORY | FOSSIL ; sets
-	db RECYCLE
+	dw RECYCLE
 	dw RecycleEffectCommands ; effect commands
 	tx RecycleDescription ; description
 	dw NONE ; description (cont)

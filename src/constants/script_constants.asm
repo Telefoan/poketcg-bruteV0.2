@@ -42,7 +42,8 @@
 	const EVENT_ISAAC_TALKED                           ; $28
 	const EVENT_MAN1_TALKED                            ; $29
 	const EVENT_MAN1_WAITING_FOR_CARD                  ; $2a
-	const EVENT_MAN1_REQUESTED_CARD_ID                 ; $2b
+	const EVENT_MAN1_REQUESTED_CARD_ID_LO                 ; $2b
+	const EVENT_MAN1_REQUESTED_CARD_ID_HI				; $2c
 	const EVENT_MAN1_GIFT_SEQUENCE_STATE               ; $2c
 	const EVENT_MAN1_GIFTED_CARD_FLAGS                 ; $2d
 	const EVENT_MEDAL_COUNT                            ; $2e
